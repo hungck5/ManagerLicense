@@ -1,0 +1,29 @@
+<h1>License Management</h1>
+
+<form method="post" asp-action="Create">
+    <label for="user">User:</label>
+    <input type="text" name="user" id="user" required />
+    <button type="submit">Create License</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>License Key</th>
+            <th>User</th>
+            <th>Expiration Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var license in Model)
+        {
+            <tr>
+                <td>@license.LicenseKey</td>
+                <td>@license.User</td>
+                <td>@license.ExpirationDate</td>
+                <td>@(license.IsActive ? "Active" : "Inactive")</td>
+            </tr>
+        }
+    </tbody>
+</table>
