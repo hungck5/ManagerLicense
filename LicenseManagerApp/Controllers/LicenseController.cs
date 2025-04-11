@@ -89,6 +89,18 @@ public class LicenseController : Controller
         return Ok(new { message = "License valid" });
     }
 
+    [HttpGet]
+    public IActionResult GetPublicKey()
+    {
+        if (!System.IO.File.Exists(PublicKeyPath))
+        {
+            return NotFound("Public key not found");
+        }
+
+        var publicKey = System.IO.File.ReadAllText(PublicKeyPath);
+        return Content(publicKey);
+    }
+
     private void EnsureKeyFilesExist()
     {
         if (!System.IO.File.Exists(PrivateKeyPath) || !System.IO.File.Exists(PublicKeyPath))
