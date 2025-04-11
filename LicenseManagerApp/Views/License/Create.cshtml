@@ -1,0 +1,15 @@
+@model LicenseRequest
+<h2>Create License</h2>
+<form method="post">
+    <label>User:</label>
+    <input type="text" name="User" />
+    <button type="submit">Create</button>
+</form>
+@if (ViewBag.Message != null)
+{
+    <p><strong>@ViewBag.Message</strong></p>
+    @if (ViewBag.License != null)
+    {
+        <pre>@System.Text.Json.JsonSerializer.Serialize(ViewBag.License, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })</pre>
+    }
+}

@@ -1,8 +1,13 @@
+using MvcApp.Models;
+using MvcApp.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient(); // Registers IHttpClientFactory for dependency injection
+builder.Services.AddHostedService<LicenseVerifierService>();
+builder.Services.Configure<LicenseSettings>(builder.Configuration.GetSection("ApiSettings"));
 
 var app = builder.Build();
 

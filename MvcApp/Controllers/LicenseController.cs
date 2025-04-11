@@ -1,28 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 public class LicenseController : Controller
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
+    private readonly string _baseApiUrl;
 
-    public LicenseController(IHttpClientFactory httpClientFactory)
+    public LicenseController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
-        _httpClientFactory = httpClientFactory;
+        _httpClient = httpClientFactory.CreateClient();
+        _baseApiUrl = configuration["ApiSettings:BaseUrl"];
     }
 
-    public async Task<IActionResult> VerifyLicense(string licenseKey)
+    [HttpGet]
+    public IActionResult Index()
     {
-        var client = _httpClientFactory.CreateClient();
-        var response = await client.GetAsync($"http://localhost:5237/license/verify?licenseKey={licenseKey}");
+        return View();
+    }
 
-        if (response.IsSuccessStatusCode)
+    [HttpPost]
+    public async Task<IActionResult> Index(LicenseInfo licenseInfo)
+    {
+        if (string.IsNullOrWhiteSpace(licenseInfo.LicenseKey))
         {
-            ViewBag.Message = "License is valid.";
+            ViewBag.Message = "License key is required.";
             return View();
         }
 
-        ViewBag.Message = "Invalid license.";
+        try 
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_baseApiUrl}/License/Verify", new { licenseKey = licenseInfo.LicenseKey });
+            var content = await response.Content.ReadAsStringAsync();
+            ViewBag.Message = content;
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Message = "Error verifying license: " + ex.Message;
+        }
+
         return View();
     }
 }

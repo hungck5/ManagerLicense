@@ -1,10 +1,9 @@
 namespace LicenseManagerApp.Models;
 
-public class License
+public record License
 {
-    public int Id { get; set; }
-    public string LicenseKey { get; set; }
-    public DateTime ExpirationDate { get; set; }
-    public bool IsActive { get; set; }
-    public string User { get; set; }
+    public string LicenseKey { get; init; }
+    public DateTime ExpirationDate { get; init; }
+    public string User { get; init; }
+    public string? Signature { get; set; }
 }

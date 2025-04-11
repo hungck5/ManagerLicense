@@ -1,0 +1,10 @@
+<h2>Verify License</h2>
+<form method="post">
+    <label>License Key:</label>
+    <input type="text" name="licenseKey" />
+    <button type="submit">Verify</button>
+</form>
+@if (ViewBag.Message != null)
+{
+    <p><strong>@ViewBag.Message</strong></p>
+}

@@ -1,9 +1,10 @@
-<h1>Verify License</h1>
-
-<form method="post" asp-action="VerifyLicense">
-    <label for="licenseKey">License Key:</label>
-    <input type="text" name="licenseKey" id="licenseKey" required />
+@{
+    ViewBag.Title = "License Verification";
+}
+<h1>License Verification</h1>
+<form method="post" asp-action="Verify">
+    <label>License Key:</label>
+    <input type="text" name="licenseKey" />
     <button type="submit">Verify</button>
 </form>
-
 <p>@ViewBag.Message</p>

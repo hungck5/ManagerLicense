@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MvcApp.Models;
+using MvcApp.Services;
 
 namespace MvcApp.Controllers;
 
@@ -15,7 +16,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var status = LicenseVerifierService.Status;
+        return View(status);
     }
 
     public IActionResult Privacy()
