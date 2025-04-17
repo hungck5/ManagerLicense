@@ -1,20 +1,26 @@
 import { useState } from "react";
-import { Input } from "@/components/input/index"; // Adjust the import path as necessary
+import { Outlet } from "react-router-dom";
+import { Input } from "@/components/input/index";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar/index";
 import { Menu } from "lucide-react";
+import ReactLogo from "@/assets/react.svg";
 
-export default function Dashboard() {
+export default function Layout() {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <aside
         className={`${
-          isSidebarOpen ? "w-64" : "w-16"
-        } bg-white shadow-md transition-all duration-300 p-4`}
+          isSidebarOpen ? "w-64 p-4" : "w-16 p-2"
+        } bg-white shadow-md transition-all duration-300`}
       >
-        <div className="text-xl font-bold mb-4">{isSidebarOpen ? "Dashboard" : "DB"}</div>
+        <div className={`flex items-center gap-2 mb-4 border-b border-gray-200
+          ${isSidebarOpen ? "justify-start p-4 my-[-2px]" : "justify-center py-3 min-h-[71px]"}
+          `}>
+          <img src={ReactLogo} alt="Logo" className="w-8 h-8 object-contain" />
+          {isSidebarOpen && <span className="text-xl font-bold">Admin</span>}
+        </div>
         <nav className="space-y-2">
           <a href="#" className="block px-2 py-1 rounded hover:bg-gray-200">Home</a>
           <a href="#" className="block px-2 py-1 rounded hover:bg-gray-200">Reports</a>
@@ -22,7 +28,6 @@ export default function Dashboard() {
         </nav>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col">
         {/* Top bar */}
         <header className="flex items-center justify-between bg-white shadow px-6 py-4">
@@ -43,10 +48,8 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Content area */}
         <div className="flex-1 p-6 overflow-auto">
-          <h1 className="text-2xl font-semibold">Welcome to your dashboard</h1>
-          {/* Add your content here */}
+          <Outlet />
         </div>
       </main>
     </div>

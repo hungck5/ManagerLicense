@@ -1,13 +1,9 @@
 import './App.css'
-import Dashboard from '@/components/layout/index'
+import AppRouter from './router';
 
 function App() {
 
-  return (
-    <>
-    <Dashboard />
-    </>
-  )
+  return <AppRouter />;
 }
 
 export default App
