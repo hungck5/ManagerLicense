@@ -28,8 +28,7 @@ export function MenuGroup({ label, icon, children, isSidebarOpen }: MenuGroupPro
     >
       <button
         onClick={() => setOpen(!open)}
-        className={`flex items-center w-full gap-2 px-2 py-2 rounded hover:bg-gray-300 transition-colors
-          ${isSidebarOpen ? "justify-start" : "justify-center"}`}
+        className={`flex items-center w-full gap-2 px-2 py-2 rounded hover:bg-gray-200 transition-colors justify-start`}
         aria-expanded={open}
       >
         <span className="text-gray-700">{icon}</span>
@@ -44,11 +43,15 @@ export function MenuGroup({ label, icon, children, isSidebarOpen }: MenuGroupPro
             </span>
           </>
         )}
-        {!isSidebarOpen && <ChevronRight size={18} className="ml-auto text-gray-500" />}
+        {!isSidebarOpen && 
+          <span className="ml-auto text-gray-500">
+          <ChevronRight size={18} />
+          </span>
+        }
       </button>
 
-      <ul className={`overflow-hidden
-          ${isSidebarOpen ? "transition-all duration-300 ease-in-out pl-4 mt-1 space-y-1" : "transition-none absolute left-full top-0 mt-1 w-48 shadow-md rounded z-10 bg-gray-100"} 
+      <ul className={`overflow-hidden border border-gray-300
+          ${isSidebarOpen ? "transition-all duration-300 ease-in-out pl-4 mt-1 space-y-1" : "transition-none absolute left-full top-0 mt-1 w-48 shadow-md rounded z-10 bg-white"} 
           ${showSubmenu ? "max-h-[500px] opacity-100 pointer-events-auto" : "max-h-0 opacity-0 pointer-events-none"}
         `}>
         {showSubmenu &&

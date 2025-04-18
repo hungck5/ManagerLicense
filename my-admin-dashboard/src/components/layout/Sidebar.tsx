@@ -17,14 +17,11 @@ export function Sidebar({ isSidebarOpen }: SidebarProps) {
   return (
     <nav role="navigation" aria-label="Main Sidebar">
         <ul className="space-y-2">
-          <MenuItem to="/" label="Dashboard" icon={<Home size={20} />} isSidebarOpen={isSidebarOpen} />
+          <MenuItem to="/dashboard" label="Dashboard" icon={<Home size={20} />} isSidebarOpen={isSidebarOpen} />
 
           <MenuGroup label="Reports" icon={<BarChart size={20} />} isSidebarOpen={isSidebarOpen}>
             <MenuItem to="/reports/sales" label="Sales" icon={<FileText size={18} />} isSidebarOpen={isSidebarOpen} />
             <MenuItem to="/reports/users" label="Users" icon={<User size={18} />} isSidebarOpen={isSidebarOpen} />
-            <MenuItem to="/reports/users" label="Users 1" icon={<User size={18} />} isSidebarOpen={isSidebarOpen} />
-            <MenuItem to="/reports/users" label="Users 2" icon={<User size={18} />} isSidebarOpen={isSidebarOpen} />
-            <MenuItem to="/reports/users" label="Users 3" icon={<User size={18} />} isSidebarOpen={isSidebarOpen} />
           </MenuGroup>
 
           <MenuGroup label="Projects" icon={<Folder size={20} />} isSidebarOpen={isSidebarOpen}>

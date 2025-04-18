@@ -17,9 +17,9 @@ export function MenuItem({ to, icon, label, isSidebarOpen, forceShowLabel = fals
       <NavLink
         to={to}
         className={({ isActive }) =>
-          `flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-200 text-gray-800 
+          `flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-200 text-gray-800 justify-start
           ${isActive ? "bg-gray-100 font-semibold" : ""} 
-          ${shouldShowLabel ? "justify-start" : "justify-center"}`
+          `
         }
       >
         {icon}

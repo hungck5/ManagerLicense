@@ -5,6 +5,13 @@ type AvatarProps = {
   children: React.ReactNode;
 };
 
+type AvatarImageProps = React.ImgHTMLAttributes<HTMLImageElement>;
+
+type AvatarFallbackProps = {
+  className?: string;
+  children: React.ReactNode;
+};
+
 export function Avatar({ className = "", children }: AvatarProps) {
   return (
     <div
@@ -15,25 +22,17 @@ export function Avatar({ className = "", children }: AvatarProps) {
   );
 }
 
-type AvatarImageProps = React.ImgHTMLAttributes<HTMLImageElement>;
-
 export function AvatarImage({ className = "", ...props }: AvatarImageProps) {
   return (
     <img
       className={`w-full h-full object-cover ${className}`}
       {...props}
       onError={(e) => {
-        // Khi load ảnh lỗi thì ẩn ảnh
         (e.target as HTMLImageElement).style.display = "none";
       }}
     />
   );
 }
-
-type AvatarFallbackProps = {
-  className?: string;
-  children: React.ReactNode;
-};
 
 export function AvatarFallback({ className = "", children }: AvatarFallbackProps) {
   return (
