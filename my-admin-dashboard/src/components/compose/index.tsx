@@ -1,148 +1,144 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { createEditor, Descendant } from "slate";
+import { createEditor, Descendant, Transforms, Element as SlateElement } from "slate";
 import { Slate, Editable, withReact, useSlate } from "slate-react";
-import type { RenderLeafProps } from "slate-react";
+import type { RenderLeafProps, RenderElementProps } from "slate-react";
 import { Editor, Text } from 'slate';
-import { Bold, Italic } from "lucide-react";
+import { Bold, Italic,Underline } from "lucide-react";
+import { Button } from "./Button";
+import { COMPOSE_PLEASE_HOLDER } from "@/constants/app-constants";
 
-function Button({ onMouseDown, children, className }: { onMouseDown: (e: React.MouseEvent) => void; children: React.ReactNode; className?: string }) {
-  return (
-    <button
-      onMouseDown={onMouseDown}
-      className={`px-2 py-1 border rounded bg-gray-100 hover:bg-gray-200 ${className}`}
-    >
-      {children}
-    </button>
-  );
+enum FormatTextEnum {
+  Bold = "bold",
+  Italic = "italic",
+  Underline = "underline",
 }
 
-// type CustomText = { text: string; bold?: boolean; italic?: boolean, [key: string]: any;};
-// declare module 'slate' {
-//   interface CustomTypes {
-//     Editor: BaseEditor & ReactEditor;
-//     Element: { type: 'paragraph'; children: CustomText[] };
-//     Text: CustomText;
-//   }
-// }
+const FORMAT_TEXT_LIST = [FormatTextEnum.Bold, FormatTextEnum.Italic, FormatTextEnum.Underline] as const;
+type FormatText = (typeof FORMAT_TEXT_LIST)[number];
+
+interface ToggleMarkProps {
+  event: React.MouseEvent;
+  editor: Editor;
+  format: FormatText;
+  setMarks: React.Dispatch<React.SetStateAction<MarksType>>;
+}
+type MarksType = {
+  [key in FormatText]?: boolean;
+}
 
 export function ComposeEditor() {
-  const editor = useMemo(() => withReact(createEditor()), []);
+  
+  const [marks, setMarks] = useState<MarksType>({});
   const [value, setValue] = useState<Descendant[]>([
     {
       type: "paragraph",
-      children: [{ text: "Soạn tin nhắn tại đây..." }],
+      children: [{ text: "" }],
     },
   ]);
-
-  //const renderElement = useCallback((props: RenderElementProps) => <DefaultElement {...props} />, []);
-  //const renderLeaf = useCallback((props: RenderLeafProps) => <DefaultLeaf {...props} />, []);
+  
+  const editor = useMemo(() => withReact(createEditor()), []);
   const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
-  const [marks, setMarks] = useState<{ bold?: boolean; italic?: boolean }>({});
+  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, []);
 
   return (
     <div className="border rounded-lg p-4 shadow-sm space-y-2 border-gray-300">
       <Slate editor={editor} initialValue={value}
-        onChange={(newValue: any) => {
-            setValue(newValue);
-        
-            // const marks = Editor.marks(editor);
-            // if (marks?.bold) {
-            //   Editor.addMark(editor, "bold", true);
-            // }
-            // if (marks?.italic) {
-            //   Editor.addMark(editor, "italic", true);
-            // }
-        }}>
+        onChange={(newValue: any) => setValue(newValue)}>
         <Toolbar marks={marks} setMarks={setMarks} />
-        {/* <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Soạn nội dung..."
-          className="min-h-[120px] focus:outline-none"
-        /> */}
-
         <Editable
+          renderElement={renderElement}
           renderLeaf={renderLeaf}
           className="min-h-[150px] p-2 border rounded focus:outline-none border-gray-300"
           onKeyDown={() => {
-            // Đảm bảo thêm/loại bỏ mark đúng khi gõ
             if (marks.bold) {
-              // Tự động áp dụng bold khi gõ
-              Editor.addMark(editor, 'bold', true);
+              Editor.addMark(editor, FormatTextEnum.Bold, true);
             }
             if (marks.italic) {
-              // Tự động áp dụng italic khi gõ
-              Editor.addMark(editor, 'italic', true);
+              Editor.addMark(editor, FormatTextEnum.Italic, true);
             }
+            if (marks.underline) {
+              Editor.addMark(editor, FormatTextEnum.Underline, true);
+            } 
           }}
+          placeholder={COMPOSE_PLEASE_HOLDER}
         />
       </Slate>
     </div>
   );
 }
 
-// const DefaultElement = (props: RenderElementProps) => {
-//   return <p {...props.attributes}>{props.children}</p>;
-// };
-
-// const DefaultLeaf = (props: RenderLeafProps) => {
-//   return <span {...props.attributes}>{props.children}</span>;
-// };
-
-function Toolbar({ marks, setMarks }: { marks: { bold?: boolean; italic?: boolean }; setMarks: React.Dispatch<React.SetStateAction<{ bold?: boolean; italic?: boolean }>> }) {
+function Toolbar({ marks, setMarks }: {
+   marks: MarksType; 
+   setMarks: React.Dispatch<React.SetStateAction<MarksType>> 
+  }) {
   const editor = useSlate();
+  const setBlock = (type: string) => { 
+    const isActive = isBlockActive(editor, type); 
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? "paragraph" : type }, 
+      { match: (n) => SlateElement.isElement(n) && Editor.isBlock(editor, n) }
+    );
+  };
+
   return (
     <div className="flex gap-2 border-b border-gray-200 p-2">
-      {/* <Button onMouseDown={(e) => toggleMark(e, editor, 'bold')}
-        className={p-1 rounded hover:bg-gray-200 ${
-          isMarkActive(editor, "bold") ? "bg-gray-300 text-black" : "text-gray-500"
-        }}>
-          <Bold size={18} />
-      </Button>
-      <Button onMouseDown={(e) => toggleMark(e, editor, 'italic')}
-        className={p-1 rounded hover:bg-gray-200 ${
-          isMarkActive(editor, "italic") ? "bg-gray-300 text-black" : "text-gray-500"
-        }}>
-          <Italic size={18} />
-      </Button> */}
-
-      <Button onMouseDown={(e) => toggleMark(e, editor, 'bold', setMarks)}
+      {/* <Button onMouseDown={(e) => toggleMark({ event: e, editor, format: 'bold', setMarks })}
         className={`p-1 rounded hover:bg-gray-200 ${
           marks.bold ? "bg-gray-300 text-black" : "text-gray-500"
         }`}>
           <Bold size={18} />
       </Button>
-      <Button onMouseDown={(e) => toggleMark(e, editor, 'italic', setMarks)}
+      <Button onMouseDown={(e) => toggleMark({ event: e, editor, format: 'italic', setMarks })}
         className={`p-1 rounded hover:bg-gray-200 ${
           marks.italic ? "bg-gray-300 text-black" : "text-gray-500"
         }`}>
           <Italic size={18} />
-      </Button>
+      </Button> */}
+      {(FORMAT_TEXT_LIST).map((format) => (
+        <Button
+          key={format}
+          onMouseDown={(e) => toggleMark({ event: e, editor, format, setMarks })}
+          className={`p-1 rounded hover:bg-gray-200 ${marks[format] ? "bg-gray-300 text-black" : "text-gray-500"}`}
+        >
+          {format === FormatTextEnum.Bold && <Bold size={18} />}
+          {format === FormatTextEnum.Italic && <Italic size={18} />}
+          {format === FormatTextEnum.Underline  && <Underline size={18} />}
+        </Button>
+      ))}
 
+      {Array.from({ length: 6 }, (_, i) => ( 
+        <Button 
+          key={i} 
+          onMouseDown={(e) => { 
+            e.preventDefault(); 
+            setBlock(`h${i + 1}`); 
+          }} 
+          className="text-xs px-2 py-1 rounded hover:bg-gray-200 text-gray-600" 
+        > 
+          H{i + 1} 
+        </Button> 
+      ))} 
     </div>
   );
 }
 
-function toggleMark(event: React.MouseEvent, editor: Editor, format: 'bold' | 'italic', setMarks: React.Dispatch<React.SetStateAction<{ bold?: boolean; italic?: boolean }>> ) {
+function toggleMark({ event, editor, format, setMarks }: ToggleMarkProps) {
   event.preventDefault();
-  // const isActive = isMarkActive(editor, format);
-  // if (isActive) {
-  //   Editor.removeMark(editor, format);
-  // } else {
-  //   Editor.addMark(editor, format, true);
-  // }
 
   const isActive = isMarkActive(editor, format);
+  const updateMarks = (active: boolean) => setMarks((prev) => ({ ...prev, [format]: active }));
+
   if (isActive) {
     Editor.removeMark(editor, format);
-    setMarks((prev) => ({ ...prev, [format]: false }));
+    updateMarks(false);
   } else {
     Editor.addMark(editor, format, true);
-    setMarks((prev) => ({ ...prev, [format]: true }));
+    updateMarks(true);
   }
 }
 
-function isMarkActive(editor: Editor, format: string) {
+function isMarkActive(editor: Editor, format: FormatText) {
   const [match] = Editor.nodes(editor, {
     match: (n) => Text.isText(n) && n[format] === true,
     universal: true,
@@ -151,8 +147,28 @@ function isMarkActive(editor: Editor, format: string) {
   return !!match;
 }
 
+function isBlockActive(editor: Editor, format: string) { 
+  const [match] = Editor.nodes(editor, { 
+    match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format, 
+  }); 
+  return !!match; 
+}
+
 const Leaf = ({ attributes, children, leaf }: any) => {
   if (leaf.bold) children = <strong>{children}</strong>;
   if (leaf.italic) children = <em>{children}</em>;
+  if (leaf.underline) children = <u>{children}</u>;
   return <span {...attributes}>{children}</span>;
+};
+
+const Element = ({ attributes, children, element }: RenderElementProps) => {
+  switch (element.type) { 
+    case 'h1': return <h1 className="text-3xl font-bold" {...attributes}>{children}</h1>;
+    case 'h2': return <h2 className="text-2xl font-bold" {...attributes}>{children}</h2>;
+    case 'h3': return <h3 className="text-xl font-bold" {...attributes}>{children}</h3>;
+    case 'h4': return <h4 className="text-lg font-bold" {...attributes}>{children}</h4>;
+    case 'h5': return <h5 className="text-base font-bold" {...attributes}>{children}</h5>;
+    case 'h6': return <h6 className="text-sm font-bold" {...attributes}>{children}</h6>;
+    default: return <p {...attributes}>{children}</p>;
+  }
 };
