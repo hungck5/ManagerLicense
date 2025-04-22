@@ -1,9 +1,8 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { createEditor, Descendant, BaseEditor } from "slate";
-import { Slate, Editable, withReact, ReactEditor, useSlate } from "slate-react";
-import type { RenderElementProps, RenderLeafProps } from "slate-react";
-import { Editor, Transforms, Text } from 'slate';
-//import { Editor } from 'slate';
+import { createEditor, Descendant } from "slate";
+import { Slate, Editable, withReact, useSlate } from "slate-react";
+import type { RenderLeafProps } from "slate-react";
+import { Editor, Text } from 'slate';
 import { Bold, Italic } from "lucide-react";
 
 function Button({ onMouseDown, children, className }: { onMouseDown: (e: React.MouseEvent) => void; children: React.ReactNode; className?: string }) {
@@ -17,14 +16,14 @@ function Button({ onMouseDown, children, className }: { onMouseDown: (e: React.M
   );
 }
 
-type CustomText = { text: string; bold?: boolean; italic?: boolean, [key: string]: any;};
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
-    Element: { type: 'paragraph'; children: CustomText[] };
-    Text: CustomText;
-  }
-}
+// type CustomText = { text: string; bold?: boolean; italic?: boolean, [key: string]: any;};
+// declare module 'slate' {
+//   interface CustomTypes {
+//     Editor: BaseEditor & ReactEditor;
+//     Element: { type: 'paragraph'; children: CustomText[] };
+//     Text: CustomText;
+//   }
+// }
 
 export function ComposeEditor() {
   const editor = useMemo(() => withReact(createEditor()), []);
@@ -65,7 +64,7 @@ export function ComposeEditor() {
         <Editable
           renderLeaf={renderLeaf}
           className="min-h-[150px] p-2 border rounded focus:outline-none border-gray-300"
-          onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => {
+          onKeyDown={() => {
             // Đảm bảo thêm/loại bỏ mark đúng khi gõ
             if (marks.bold) {
               // Tự động áp dụng bold khi gõ
