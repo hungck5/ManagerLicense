@@ -3,3 +3,4 @@
 .vscode/
 
 */appsettings.Development.json
+*/dist/
