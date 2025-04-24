@@ -3,6 +3,35 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <partial name="_PartnerSlider" />
 </div>
+@section Scripts {
+  <script>
+    window.addEventListener('load', function () {
+      new Swiper(".partnerSwiper", {
+        slidesPerView: 3,
+        spaceBetween: 30,
+        loop: true,
+        autoplay: {
+          delay: 2000,
+          disableOnInteraction: false,
+        },
+        
+        breakpoints: {
+          320: { slidesPerView: 1 },
+          576: { slidesPerView: 1 },
+          768: { slidesPerView: 1 },
+          992: { slidesPerView: 1 },
+        },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+        },
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+      });
+    });
+  </script>
+}
