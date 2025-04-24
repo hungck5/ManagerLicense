@@ -2,36 +2,47 @@
     ViewData["Title"] = "Home Page";
 }
 
+@section Styles {
+  <link rel="stylesheet" href="~/css/partner-slider.css" />
+  <link rel="stylesheet" href="~/css/section.css" />
+}
+
 <div class="text-center">
     <partial name="_PartnerSlider" />
+    <partial name="_Section" />
 </div>
 @section Scripts {
   <script>
-    window.addEventListener('load', function () {
-      new Swiper(".partnerSwiper", {
-        slidesPerView: 3,
-        spaceBetween: 30,
-        loop: true,
-        autoplay: {
-          delay: 2000,
-          disableOnInteraction: false,
-        },
-        
-        breakpoints: {
-          320: { slidesPerView: 1 },
-          576: { slidesPerView: 1 },
-          768: { slidesPerView: 1 },
-          992: { slidesPerView: 1 },
-        },
-        pagination: {
-          el: ".swiper-pagination",
-          clickable: true,
-        },
-        navigation: {
-          nextEl: ".swiper-button-next",
-          prevEl: ".swiper-button-prev",
-        },
-      });
+    new Swiper(".partner", {
+      direction: 'horizontal',
+      slidesPerView: 1,
+      spaceBetween: 10,
+      autoplay: {
+        delay: 2500,
+        disableOnInteraction: false,
+      },
+      loop: true,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+      pagination: {
+        el: ".swiper-pagination",
+      },
+      mousewheel: true,
+      keyboard: true,
+    });
+
+    new Swiper(".gyomuSwiper", {
+      slidesPerView: 6,
+      spaceBetween: 10,
+      autoplay: false,
+      allowTouchMove: false,
+      loop: false,
+      navigation: {
+        nextEl: ".swiper-button-next1",
+        prevEl: ".swiper-button-prev1",
+      },
     });
   </script>
 }
