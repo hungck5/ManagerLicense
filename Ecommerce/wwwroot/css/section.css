@@ -1,0 +1,48 @@
+.gyomu-products-section {
+  background-color: #fff;
+}
+
+.product-card img {
+  height: 150px;
+  object-fit: contain;
+}
+
+.product-card .product-name {
+  font-size: 14px;
+  min-height: 40px;
+}
+
+.quantity-control input {
+  width: 50px;
+}
+
+.product-card .d-flex {
+  white-space: nowrap;
+}
+
+.quantity-control {
+  justify-content: center;
+}
+
+.quantity-input {
+  width: 48px;
+  height: 32px;
+  text-align: center;
+  background-color: rgb(250, 250, 250);
+  border: none;             
+  border-radius: 6px;      
+  font-size: 14px;
+  padding: 0;
+  appearance: textfield;
+}
+
+/* Ẩn mũi tên tăng/giảm mặc định của input type="number" */
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantity-input[type=number] {
+  -moz-appearance: textfield; /* Firefox */
+}
