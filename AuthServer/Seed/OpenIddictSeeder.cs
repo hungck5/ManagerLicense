@@ -39,7 +39,6 @@ public static class OpenIddictSeeder
       });
     }
 
-    // Tạo Scope
     if (await scopeManager.FindByNameAsync("ecommerce_api") is null)
     {
       await scopeManager.CreateAsync(new OpenIddictScopeDescriptor

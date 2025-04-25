@@ -16,7 +16,7 @@ public class AuthorizationController : Controller
         var request = HttpContext.GetOpenIddictServerRequest() ??
                       throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        if (!User.Identity.IsAuthenticated)
+        if (User.Identity == null || !User.Identity.IsAuthenticated)
         {
             return Challenge(new AuthenticationProperties
             {
