@@ -64,7 +64,7 @@ builder.Services.AddOpenIddict()
     {
       options.UseLocalServer();
       options.UseAspNetCore();
-      options.SetIssuer(new Uri("https://localhost:7294/"));
+      options.SetIssuer(new Uri("https://localhost:7294"));
     });
     
 builder.Services.AddControllersWithViews();

@@ -20,7 +20,7 @@ public class AccountController : Controller
     public async Task<IActionResult> LoginPost(string username, string password, string returnUrl)
     {
         // Check username/password, ví dụ hardcoded trước cho nhanh
-        if (username == "admin" && password == "password")
+        if (username == "admin" && password == "123")
         {
             var claims = new List<Claim>
             {
@@ -38,4 +38,14 @@ public class AccountController : Controller
 
         return Unauthorized();
     }
+
+    // [HttpPost]
+    // [ValidateAntiForgeryToken]
+    // public async Task<IActionResult> Logout()
+    // {
+    //     await HttpContext.SignOutAsync("Cookies");
+    //     await HttpContext.SignOutAsync("oidc");
+
+    //     return RedirectToAction("Index", "Home");
+    // }
 }

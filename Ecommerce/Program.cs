@@ -29,11 +29,22 @@ builder.Services.AddAuthentication(options =>
     options.SaveTokens = true;
     options.CallbackPath = "/signin-oidc";
     options.SignedOutCallbackPath = "/signout-callback-oidc";
+    options.SignedOutRedirectUri = "/";
 
     options.Scope.Add("ecommerce_api");
     options.Scope.Add("openid");
     options.Scope.Add("profile");
     options.RequireHttpsMetadata = true;
+
+    options.Events = new OpenIdConnectEvents
+    {
+        OnSignedOutCallbackRedirect = context =>
+        {
+            Console.WriteLine("Redirecting after signout callback.");
+            context.Response.Redirect("/");
+            return Task.CompletedTask;
+        }
+    };
 });
 
 var app = builder.Build();

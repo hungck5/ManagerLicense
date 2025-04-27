@@ -71,8 +71,19 @@
 
             <!-- Right Nav Buttons -->
             <div class="d-flex align-items-center gap-3">
-                <a asp-controller="Authorization" asp-action="Login" class="text-dark text-decoration-none">Đăng nhập</a>
-                <a href="#" class="btn btn-outline-success">Đăng ký</a>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <span>Hi, @User.Identity.Name!</span>
+                    <form asp-controller="Authorization" asp-action="Logout" method="post" style="display:inline;">
+                        <button type="submit">Đăng xuất</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Authorization" asp-action="Login" class="text-dark text-decoration-none">Đăng nhập</a>
+                    <a href="#" class="btn btn-outline-success">Đăng ký</a>
+                }
+
                 <a href="#" class="text-dark fs-5 position-relative">
                     <i class="bi bi-cart"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">2</span>
