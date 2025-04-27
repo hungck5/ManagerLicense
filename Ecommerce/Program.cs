@@ -11,22 +11,29 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultScheme = "Cookies";
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 })
-.AddCookie()
+.AddCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.SlidingExpiration = true;
+})
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = "https://localhost:5000";
+    options.Authority = "https://localhost:7015";
     options.ClientId = "ecommerce_app";
     options.ResponseType = "code";
     options.UsePkce = true;
     options.SaveTokens = true;
     options.CallbackPath = "/signin-oidc";
     options.SignedOutCallbackPath = "/signout-callback-oidc";
+
     options.Scope.Add("ecommerce_api");
     options.Scope.Add("openid");
     options.Scope.Add("profile");
+    options.RequireHttpsMetadata = true;
 });
 
 var app = builder.Build();
@@ -41,7 +48,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

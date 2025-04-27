@@ -18,8 +18,8 @@ public static class OpenIddictSeeder
         ClientId = "ecommerce_app",
         ConsentType = ConsentTypes.Implicit,
         DisplayName = "Ecommerce Web App",
-        PostLogoutRedirectUris = { new Uri("https://localhost:5001/signout-callback-oidc") },
-        RedirectUris = { new Uri("https://localhost:5001/signin-oidc") },
+        PostLogoutRedirectUris = { new Uri("https://localhost:7294/signout-callback-oidc") },
+        RedirectUris = { new Uri("https://localhost:7294/signin-oidc") },
         Permissions =
             {
                 Permissions.Endpoints.Authorization,

@@ -2,12 +2,24 @@ using AuthServer.DB;
 using OpenIddict.Abstractions;
 using AuthServer.seed;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.Validation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
   options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
   options.UseOpenIddict();
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
 });
 
 builder.Services.AddAuthorization(options =>
@@ -46,21 +58,28 @@ builder.Services.AddOpenIddict()
 
       options.UseAspNetCore()
              .EnableAuthorizationEndpointPassthrough()
-             .EnableTokenEndpointPassthrough()
-             .EnableEndSessionEndpointPassthrough()
-             .EnableStatusCodePagesIntegration();
+             .EnableEndSessionEndpointPassthrough();
     })
-    .AddValidation(options =>
+    .AddValidation(options => 
     {
       options.UseLocalServer();
       options.UseAspNetCore();
+      options.SetIssuer(new Uri("https://localhost:7294/"));
     });
+    
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapGet("/", () => "Hello World!").RequireAuthorization("ApiScope");
+app.UseRouting();
+
+app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/connect/authorize"), subApp =>
+{
+    subApp.UseAuthentication();
+    subApp.UseAuthorization();
+});
+
+app.MapControllers();
 
 await OpenIddictSeeder.SeedAsync(app.Services);
 app.Run();
