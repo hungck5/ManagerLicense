@@ -22,7 +22,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = "https://localhost:7015";
+    options.Authority = "https://localhost:7130/auth";
     options.ClientId = "ecommerce_app";
     options.ResponseType = "code";
     options.UsePkce = true;

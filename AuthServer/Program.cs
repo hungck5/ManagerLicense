@@ -19,7 +19,6 @@ builder.Services.AddAuthentication(options =>
 }).AddCookie(options =>
 {
     options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
 });
 
 builder.Services.AddAuthorization(options =>
