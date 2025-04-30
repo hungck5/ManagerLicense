@@ -10,7 +10,6 @@ public static class OpenIddictSeeder
     var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
     var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
 
-    // Tạo Client cho EcommerceApp
     if (await manager.FindByClientIdAsync("ecommerce_app") is null)
     {
       await manager.CreateAsync(new OpenIddictApplicationDescriptor
@@ -47,6 +46,42 @@ public static class OpenIddictSeeder
         Resources = { "resource_server" }
       });
     }
+
+    if (await manager.FindByClientIdAsync("react_client") is null)
+        {
+            await manager.CreateAsync(new OpenIddictApplicationDescriptor
+            {
+                ClientId = "react_client",
+                DisplayName = "React.js App",
+                ConsentType = ConsentTypes.Explicit,
+                ClientType = ClientTypes.Public,                
+                PostLogoutRedirectUris =
+                {
+                    new Uri("https://localhost:3001/"),
+                },
+                RedirectUris =
+                {
+                    new Uri("https://localhost:3001/callback"),
+                },
+                Permissions =
+                {
+                    Permissions.Endpoints.Authorization,
+                    Permissions.Endpoints.Token,
+                    Permissions.GrantTypes.AuthorizationCode,
+                    Permissions.ResponseTypes.Code,
+                    Permissions.Scopes.Email,
+                    Permissions.Scopes.Profile,
+                    Permissions.Scopes.Roles,
+                    Scopes.OfflineAccess,
+                    Scopes.OfflineAccess,
+                    "ecommerce_api",
+                },
+                Requirements =
+                {
+                    Requirements.Features.ProofKeyForCodeExchange,
+                }
+            });
+        }
   }
 
 }

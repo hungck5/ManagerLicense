@@ -47,39 +47,39 @@ public class AuthorizationController : Controller
         return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
-    // [HttpPost("token")]
-    // public async Task<IActionResult> Exchange()
-    // { 
-    //     Console.WriteLine("Exchange token request received.");
-    //     var request = HttpContext.GetOpenIddictServerRequest() ??
-    //                 throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+    [HttpPost("token")]
+    public async Task<IActionResult> Exchange()
+    { 
+        Console.WriteLine("Exchange token request received.");
+        var request = HttpContext.GetOpenIddictServerRequest() ??
+                    throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-    //     if (request.IsAuthorizationCodeGrantType())
-    //     {
-    //         var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        if (request.IsAuthorizationCodeGrantType())
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-    //         var claims = new List<Claim>
-    //         {
-    //             new(OpenIddictConstants.Claims.Subject, authenticateResult.Principal.Identity?.Name ?? "user123"),
-    //             new(OpenIddictConstants.Claims.Email, "test@example.com"),
-    //             new(OpenIddictConstants.Claims.Name, "John Doe")
-    //         };
+            var claims = new List<Claim>
+            {
+                new(OpenIddictConstants.Claims.Subject, authenticateResult.Principal.Identity?.Name ?? "user123"),
+                new(OpenIddictConstants.Claims.Email, "test@example.com"),
+                new(OpenIddictConstants.Claims.Name, "John Doe")
+            };
 
-    //         var identity = new ClaimsIdentity(claims,
-    //             TokenValidationParameters.DefaultAuthenticationType,
-    //             OpenIddictConstants.Claims.Name,
-    //             OpenIddictConstants.Claims.Role);
+            var identity = new ClaimsIdentity(claims,
+                TokenValidationParameters.DefaultAuthenticationType,
+                OpenIddictConstants.Claims.Name,
+                OpenIddictConstants.Claims.Role);
 
-    //         var principal = new ClaimsPrincipal(identity);
+            var principal = new ClaimsPrincipal(identity);
 
-    //         principal.SetScopes(request.GetScopes());
-    //         principal.SetResources("resource_server");
+            principal.SetScopes(request.GetScopes());
+            principal.SetResources("resource_server");
 
-    //         return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-    //     }
+            return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
 
-    //     throw new InvalidOperationException("The specified grant type is not supported.");
-    // }
+        throw new InvalidOperationException("The specified grant type is not supported.");
+    }
 
     [HttpGet("logout")]
     public async Task<IActionResult> Logout()

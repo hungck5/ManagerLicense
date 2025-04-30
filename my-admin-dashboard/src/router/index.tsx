@@ -4,6 +4,7 @@ import Dashboard from "@/pages/dashboard/index";
 import Settings from "@/pages/settings/index";
 import LoginPage from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
+import CallbackPage from "@/pages/CallbackPage";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
         element: <Settings />,
       },
     ],
+  },
+  {
+    path: "/callback",
+    element: <CallbackPage />,
   },
   {
     path: "*",

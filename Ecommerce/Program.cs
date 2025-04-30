@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("ecommerce_api");
     options.Scope.Add("openid");
     options.Scope.Add("profile");
+    options.GetClaimsFromUserInfoEndpoint = true;
     options.RequireHttpsMetadata = true;
 
     options.Events = new OpenIdConnectEvents
