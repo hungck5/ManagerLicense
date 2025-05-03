@@ -3,7 +3,6 @@ using OpenIddict.Abstractions;
 using AuthServer.seed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using OpenIddict.Client;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,49 +31,48 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddOpenIddict()
-		.AddCore(options =>
-		{
-			options.UseEntityFrameworkCore()
-					.UseDbContext<ApplicationDbContext>();
-		})
-		.AddServer(options =>
-		{
-			options.SetTokenEndpointUris("/connect/token")
-						 .SetAuthorizationEndpointUris("/connect/authorize")
-						 .SetEndSessionEndpointUris("/connect/logout")
-						 .SetConfigurationEndpointUris("/.well-known/openid-configuration")
-       			.SetIntrospectionEndpointUris("/connect/introspect");
+	.AddCore(options =>
+	{
+		options.UseEntityFrameworkCore()
+			.UseDbContext<ApplicationDbContext>();
+	})
+	.AddServer(options =>
+	{
+		options.SetIssuer(new Uri("https://localhost:7130/"));
+		options.SetTokenEndpointUris("/connect/token")
+			.SetAuthorizationEndpointUris("/connect/authorize")
+			.SetEndSessionEndpointUris("/connect/logout")
+			.SetConfigurationEndpointUris("/.well-known/openid-configuration")
+			.SetIntrospectionEndpointUris("/connect/introspect");
 
-			options.SetIssuer(new Uri("https://localhost:7130/auth"));
-			options.AllowAuthorizationCodeFlow()
-						 .RequireProofKeyForCodeExchange()
-						 .AllowRefreshTokenFlow();
+		options.AllowAuthorizationCodeFlow()
+			.RequireProofKeyForCodeExchange()
+			.AllowRefreshTokenFlow();
 
-			options.AcceptAnonymousClients();
-			options.RegisterScopes(
-					OpenIddictConstants.Scopes.OpenId,
-					OpenIddictConstants.Scopes.Email,
-					OpenIddictConstants.Scopes.Profile,
-					OpenIddictConstants.Scopes.Roles,
-					OpenIddictConstants.Scopes.OfflineAccess,
-					"ecommerce_api"
-			);
+		options.AcceptAnonymousClients();
+		options.RegisterScopes(
+			OpenIddictConstants.Scopes.OpenId,
+			OpenIddictConstants.Scopes.Email,
+			OpenIddictConstants.Scopes.Profile,
+			OpenIddictConstants.Scopes.Roles,
+			OpenIddictConstants.Scopes.OfflineAccess,
+			"ecommerce_api"
+		);
 
-			options.AddEphemeralEncryptionKey()
-						 .AddEphemeralSigningKey();
+		options.AddEphemeralEncryptionKey()
+			.AddEphemeralSigningKey();
 
-			options.UseAspNetCore()
-						 .EnableTokenEndpointPassthrough()
-						 .EnableAuthorizationEndpointPassthrough()
-						 .EnableEndSessionEndpointPassthrough();
-						
-		})
-		.AddValidation(options =>
-		{
-			options.UseLocalServer();
-			options.UseAspNetCore();
-			options.SetIssuer(new Uri("https://localhost:7130/auth"));
-		});
+		options.UseAspNetCore()
+			.EnableTokenEndpointPassthrough()
+			.EnableAuthorizationEndpointPassthrough()
+			.EnableEndSessionEndpointPassthrough();
+					
+	})
+	.AddValidation(options =>
+	{
+		options.UseLocalServer();
+		options.UseAspNetCore();
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -83,7 +81,6 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost
 };
 
-// Nếu chạy local, cần allow loopback addresses:
 forwardedHeadersOptions.KnownNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
 
@@ -91,13 +88,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.Use(async (context, next) =>
-{
-	Console.WriteLine($"Request: {context.Request.Method} {context.Request.Scheme} {context.Request.Host.Value} ");
-    Console.WriteLine($"Request: {context.Request.PathBase.Value} {context.Request.Path}");
-    await next();
-    Console.WriteLine($"Response: {context.Response.StatusCode}");
-});
 app.UseForwardedHeaders(forwardedHeadersOptions);
 app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/connect/authorize"), subApp =>
 {
@@ -106,6 +96,5 @@ app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/connect/authorize"), s
 });
 
 app.MapControllers();
-
 await OpenIddictSeeder.SeedAsync(app.Services);
 app.Run();

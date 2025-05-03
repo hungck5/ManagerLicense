@@ -9,10 +9,6 @@ const oidcConfig = {
   scope: "openid profile email offline_access",
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   code_challenge_method: 'S256',
-  logging: {
-    level: 3, 
-    console: window.console
-  }
 };
 
 export const userManager = new UserManager(oidcConfig);

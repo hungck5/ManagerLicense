@@ -1,51 +1,49 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+  options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+  options.DefaultScheme = "Cookies";
+  options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
 })
 .AddCookie(options =>
 {
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.SlidingExpiration = true;
+  options.Cookie.HttpOnly = true;
+  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+  options.SlidingExpiration = true;
 })
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-    options.Authority = "https://localhost:7130/auth";
-    options.ClientId = "ecommerce_app";
-    options.ResponseType = "code";
-    options.UsePkce = true;
-    options.SaveTokens = true;
-    options.CallbackPath = "/signin-oidc";
-    options.SignedOutCallbackPath = "/signout-callback-oidc";
-    options.SignedOutRedirectUri = "/";
+  options.Authority = "https://localhost:7130/auth";
+  options.ClientId = "ecommerce_app";
+  options.ResponseType = "code";
+  options.UsePkce = true;
+  options.SaveTokens = true;
+  options.CallbackPath = "/signin-oidc";
+  options.SignedOutCallbackPath = "/signout-callback-oidc";
+  options.SignedOutRedirectUri = "/";
 
-    options.Scope.Add("ecommerce_api");
-    options.Scope.Add("openid");
-    options.Scope.Add("profile");
-    options.GetClaimsFromUserInfoEndpoint = true;
-    options.RequireHttpsMetadata = true;
+  options.Scope.Add("ecommerce_api");
+  options.Scope.Add("openid");
+  options.Scope.Add("profile");
+  options.Scope.Add("email");
+  options.GetClaimsFromUserInfoEndpoint = true;
+  options.RequireHttpsMetadata = true;
 
-    options.Events = new OpenIdConnectEvents
-    {
-        OnSignedOutCallbackRedirect = context =>
-        {
-            Console.WriteLine("Redirecting after signout callback.");
-            context.Response.Redirect("/");
-            return Task.CompletedTask;
-        }
-    };
+  options.Events = new OpenIdConnectEvents
+  {
+      OnSignedOutCallbackRedirect = context =>
+      {
+          Console.WriteLine("Redirecting after signout callback.");
+          context.Response.Redirect("/");
+          return Task.CompletedTask;
+      }
+  };
 });
 
 var app = builder.Build();
@@ -64,11 +62,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
