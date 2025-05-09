@@ -12,14 +12,12 @@ public class AccountController : Controller
     [HttpGet("login")]
     public IActionResult Login(string returnUrl)
     {
-        // Hiện form login, hoặc auto login demo
         return View();
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginPost(string username, string password, string returnUrl)
     {
-        // Check username/password, ví dụ hardcoded trước cho nhanh
         if (username == "admin" && password == "123")
         {
             var claims = new List<Claim>
