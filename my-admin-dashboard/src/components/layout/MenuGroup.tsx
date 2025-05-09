@@ -50,8 +50,8 @@ export function MenuGroup({ label, icon, children, isSidebarOpen }: MenuGroupPro
         }
       </button>
 
-      <ul className={`overflow-hidden border border-gray-300
-          ${isSidebarOpen ? "transition-all duration-300 ease-in-out pl-4 mt-1 space-y-1" : "transition-none absolute left-full top-0 mt-1 w-48 shadow-md rounded z-10 bg-white"} 
+      <ul className={`overflow-hidden
+          ${isSidebarOpen ? "transition-all duration-300 ease-in-out pl-4 mt-1 space-y-1" : "transition-none absolute left-full top-0 mt-1 w-48 shadow-md rounded z-10 bg-white border border-gray-300"} 
           ${showSubmenu ? "max-h-[500px] opacity-100 pointer-events-auto" : "max-h-0 opacity-0 pointer-events-none"}
         `}>
         {showSubmenu &&

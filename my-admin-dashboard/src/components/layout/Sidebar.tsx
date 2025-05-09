@@ -7,6 +7,7 @@ import {
   User,
   Folder,
   FileText,
+  Package,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -28,6 +29,8 @@ export function Sidebar({ isSidebarOpen }: SidebarProps) {
             <MenuItem to="/projects/active" label="Active" icon={<FileText size={18} />} isSidebarOpen={isSidebarOpen} />
             <MenuItem to="/projects/archive" label="Archived" icon={<FileText size={18} />} isSidebarOpen={isSidebarOpen} />
           </MenuGroup>
+          <MenuItem to="/users" label="Users" icon={<User size={20} />} isSidebarOpen={isSidebarOpen} />
+          <MenuItem to="/products" label="Products" icon={<Package size={20} />} isSidebarOpen={isSidebarOpen} />
 
           <MenuItem to="/settings" label="Settings" icon={<Settings size={20} />} isSidebarOpen={isSidebarOpen} />
         </ul>

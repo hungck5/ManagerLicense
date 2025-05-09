@@ -1,6 +1,8 @@
-import { userManager } from "../auth/userManager";
+import { useAuth } from "@/auth/auth-context";
 
 export default function Login() {
+  const { login, logout } = useAuth();
+
   return (
     
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -8,11 +10,11 @@ export default function Login() {
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Welcome to Admin page</h1>
         <div className="space-y-4">
           <button className="w-full py-2 px-4 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition"
-            onClick={() => userManager.signinRedirect()}>
+            onClick={() => login()}>
             Đăng nhập
           </button>
           <button className="w-full py-2 px-4 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
-            onClick={() => userManager.signoutRedirect()}>
+            onClick={() => logout()}>
             Đăng ký tài khoản
           </button>
         </div>

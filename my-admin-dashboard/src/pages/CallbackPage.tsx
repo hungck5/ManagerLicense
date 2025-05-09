@@ -1,17 +1,16 @@
 import { useEffect } from "react";
-import { userManager } from "@/auth/userManager";
+import { useAuth } from "@/auth/auth-context";
+import { useNavigate } from "react-router-dom";
 
 export default function CallbackPage() {
+  const { signinRedirectCallback } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    userManager.signinRedirectCallback()
-      .then(user => {
-        console.log("User logged in", user);
-        window.location.href = "/";
-      })
-      .catch(err => {
-        console.error("Error in callback", err);
-      });
-  }, []);
+    signinRedirectCallback().then(() => {
+      navigate("/");
+    });
+  }, [signinRedirectCallback, navigate]);
 
   return (
     <div>Processing login...</div>

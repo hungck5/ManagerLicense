@@ -5,10 +5,12 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { useAuth } from "@/auth/auth-context";
 
 export function AvatarDropdown() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const {logout} = useAuth();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -22,7 +24,7 @@ export function AvatarDropdown() {
 
   return (
     <div className="relative ml-4" ref={menuRef}>
-      {/* Avatar button */}
+      
       <button onClick={() => setOpen(!open)}>
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" alt="User" />
@@ -49,7 +51,8 @@ export function AvatarDropdown() {
               <Settings size={16} /> Settings</button>
           </li>
           <li>
-            <button className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+            <button className="flex items-center gap-3 w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+              onClick={logout}>
               <LogOut size={16} /> Logout</button>
           </li>
         </ul>
