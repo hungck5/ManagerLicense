@@ -7,6 +7,7 @@ const oidcConfig = {
   post_logout_redirect_uri: "https://localhost:3001/dashboard",
   response_type: "code",
   scope: "openid profile email offline_access",
+  stateStore: new WebStorageStateStore({ store: window.localStorage }),
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   code_challenge_method: 'S256',
 };
