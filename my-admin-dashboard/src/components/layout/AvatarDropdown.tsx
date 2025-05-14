@@ -11,8 +11,6 @@ export function AvatarDropdown() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const {logout, user} = useAuth();
-console.log(user?.profile);
-console.log(user);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,8 +27,8 @@ console.log(user);
       
       <button onClick={() => setOpen(!open)}>
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-          <AvatarFallback>U</AvatarFallback>
+          <AvatarImage src="https://github.com/shadcn.png" alt={user?.profile?.name} />
+          <AvatarFallback>{user?.profile?.name?.charAt(0)}</AvatarFallback>
         </Avatar>
       </button>
 
@@ -40,8 +38,8 @@ console.log(user);
         ${open ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
       >
         <div className="px-4 py-3 border-b border-black/10">
-          <p className="text-sm font-medium text-gray-800">John Doe</p>
-          <p className="text-xs text-gray-500">johndoe@email.com</p>
+          <p className="text-sm font-medium text-gray-800">{user?.profile?.name}</p>
+          <p className="text-xs text-gray-500">{user?.profile?.email}</p>
         </div>
         <ul className="py-1">
           <li>
