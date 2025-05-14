@@ -1,20 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore;
 using OpenIddict.Server.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 [Route("connect")]
 [AllowAnonymous]
 public class AuthorizationController : Controller
 {
-    [HttpGet("authorize")]
-    public IActionResult Authorize()
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
+    public AuthorizationController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
     {
-        Console.WriteLine("Authorize request received.");
+        _userManager = userManager;
+        _signInManager = signInManager;
+    }
+
+    [HttpGet("authorize")]
+    public async Task<IActionResult> AuthorizeAsync()
+    {
         var request = HttpContext.GetOpenIddictServerRequest() ??
                       throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
@@ -26,22 +32,20 @@ public class AuthorizationController : Controller
             });
         }
 
-        var claims = new List<Claim>
-        {
-            new(OpenIddictConstants.Claims.Subject, User.Identity.Name ?? "user123"),
-            new(OpenIddictConstants.Claims.Email, "test@example.com"),
-            new(OpenIddictConstants.Claims.Name, "John Doe")
-        };
-
-        var identity = new ClaimsIdentity(claims,
-            TokenValidationParameters.DefaultAuthenticationType,
-            OpenIddictConstants.Claims.Name,
-            OpenIddictConstants.Claims.Role);
-
-        var principal = new ClaimsPrincipal(identity);
+        var user = await _userManager.GetUserAsync(User);
+        var principal = await _signInManager.CreateUserPrincipalAsync(user);
 
         principal.SetScopes(request.GetScopes());
         principal.SetResources("resource_server");
+
+        principal.SetDestinations(claim =>
+        {
+            if (claim.Type == OpenIddictConstants.Claims.Email)
+                return new[] { OpenIddictConstants.Destinations.IdentityToken, OpenIddictConstants.Destinations.AccessToken };
+            if (claim.Type == OpenIddictConstants.Claims.Name)
+                return new[] { OpenIddictConstants.Destinations.IdentityToken, OpenIddictConstants.Destinations.AccessToken };
+            return new[] { OpenIddictConstants.Destinations.AccessToken };
+        });
 
         return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
@@ -56,23 +60,20 @@ public class AuthorizationController : Controller
         if (request.IsAuthorizationCodeGrantType())
         {
             var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-
-            var claims = new List<Claim>
-            {
-                new(OpenIddictConstants.Claims.Subject, authenticateResult.Principal.Identity?.Name ?? "user123"),
-                new(OpenIddictConstants.Claims.Email, "test@example.com"),
-                new(OpenIddictConstants.Claims.Name, "John Doe")
-            };
-
-            var identity = new ClaimsIdentity(claims,
-                TokenValidationParameters.DefaultAuthenticationType,
-                OpenIddictConstants.Claims.Name,
-                OpenIddictConstants.Claims.Role);
-
-            var principal = new ClaimsPrincipal(identity);
+            var user = await _userManager.GetUserAsync(authenticateResult.Principal);
+            var principal = await _signInManager.CreateUserPrincipalAsync(user);
 
             principal.SetScopes(request.GetScopes());
             principal.SetResources("resource_server");
+
+            principal.SetDestinations(claim =>
+            {
+                if (claim.Type == OpenIddictConstants.Claims.Email)
+                    return new[] { OpenIddictConstants.Destinations.IdentityToken, OpenIddictConstants.Destinations.AccessToken };
+                if (claim.Type == OpenIddictConstants.Claims.Name)
+                    return new[] { OpenIddictConstants.Destinations.IdentityToken, OpenIddictConstants.Destinations.AccessToken };
+                return new[] { OpenIddictConstants.Destinations.AccessToken };
+            });
 
             return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
@@ -84,6 +85,7 @@ public class AuthorizationController : Controller
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync("Cookies");
+        await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
         var request = HttpContext.GetOpenIddictServerRequest();
         var postLogoutRedirectUri = request?.PostLogoutRedirectUri;
@@ -95,5 +97,4 @@ public class AuthorizationController : Controller
 
         return Redirect("~/");
     }
-
 }

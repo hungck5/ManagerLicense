@@ -4,6 +4,8 @@ using AuthServer.seed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
+using AuthServer.Factory;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -66,7 +68,7 @@ builder.Services.AddOpenIddict()
 			.EnableTokenEndpointPassthrough()
 			.EnableAuthorizationEndpointPassthrough()
 			.EnableEndSessionEndpointPassthrough();
-					
+
 	})
 	.AddValidation(options =>
 	{
@@ -84,6 +86,11 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
 forwardedHeadersOptions.KnownNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
 
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+  builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, CustomClaimsPrincipalFactory>();
+
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -97,4 +104,6 @@ app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/connect/authorize"), s
 
 app.MapControllers();
 await OpenIddictSeeder.SeedAsync(app.Services);
+await SeedUser.SeedAdminUser(app.Services);
+
 app.Run();

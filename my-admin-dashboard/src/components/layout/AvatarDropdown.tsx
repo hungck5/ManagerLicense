@@ -10,7 +10,9 @@ import { useAuth } from "@/auth/auth-context";
 export function AvatarDropdown() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const {logout} = useAuth();
+  const {logout, user} = useAuth();
+console.log(user?.profile);
+console.log(user);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
