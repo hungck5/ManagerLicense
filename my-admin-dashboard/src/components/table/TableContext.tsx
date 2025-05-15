@@ -3,7 +3,7 @@ import { createContext, useContext, ReactNode } from "react";
 
 export interface ColumnDef<T> {
   header: string;
-  accessor: keyof T;
+  accessor: keyof T | string;
   render?: (value: any, row: T) => ReactNode;
 }
 
