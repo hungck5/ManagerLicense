@@ -4,30 +4,77 @@ import { Input } from "@/components/input";
 import { Table } from "@/components/table";
 import { Column } from "@/components/table/Column";
 import { useState } from "react";
+import CreateProductModal from "./CreateProductModal";
+import { v4 as uuidv4 } from 'uuid';
+import ProductFormModal from "./ProductModal";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   stock: number;
 }
 
 const mockData: Product[] = [
-  { id: 1, name: "Apple", price: 1.2, stock: 10 },
-  { id: 2, name: "Banana", price: 0.8, stock: 20 },
-  { id: 3, name: "Orange", price: 1.5, stock: 15 },
+  { id: uuidv4(), name: "Apple", price: 1.2, stock: 10 },
+  { id: uuidv4(), name: "Banana", price: 0.8, stock: 20 },
+  { id: uuidv4(), name: "Orange", price: 1.5, stock: 15 },
 ];
 
+const productsMock: Product[] = [
+    { id: uuidv4(), name: "Product A", price: 100, stock: 5 },
+    { id: uuidv4(), name: "Product B", price: 150, stock: 10 },
+  ];
+type ModalMode = 'create' | 'edit' | null;
+
 export default function Products() {
+  const [modalMode, setModalMode] = useState<ModalMode>(null);
+  //const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<Product[]>(productsMock);
+  const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: number } | null>(null);
+
   const filteredData = mockData.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const products: Product[] = [
-    { id: 1, name: "Product A", price: 100, stock: 5 },
-    { id: 2, name: "Product B", price: 150, stock: 10 },
-  ];
+  const handleCreateProduct = (product: { name: string; price: number; stock: number }) => {
+    const newProduct = {
+      id: uuidv4(),
+      ...product,
+    };
+    
+    setProducts((prev) => [...prev, newProduct]);
+  };
+
+
+  const handleCreate = (product: { name: string; price: number }) => {
+    console.log("Create product:", product);
+    setModalMode(null);
+    // Gọi API tạo
+  };
+
+  const handleEdit = (product: { name: string; price: number }) => {
+    console.log("Edit product:", product);
+    setModalMode(null);
+    // Gọi API cập nhật
+  };
+
+  const openCreateModal = () => {
+    setSelectedProduct(null);
+    setModalMode("create");
+    console.log("Create product pop");
+  };
+
+  const openEditModal = (product: Product) => {
+    setSelectedProduct(product);
+    setModalMode("edit");
+  };
+
+  const closeModal = () => {
+    setModalMode(null);
+    setSelectedProduct(null);
+  };
 
   return (
     <>
@@ -40,7 +87,7 @@ export default function Products() {
               onChange={(e) => setSearch(e.target.value)}
               className="max-w-sm"
             />
-            <Button onClick={() => alert("Create product clicked")}>
+            <Button onClick={openCreateModal}>
               + Create
             </Button>
           </div>
@@ -56,7 +103,7 @@ export default function Products() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => alert(`Edit ${row.name}`)}
+                    onClick={() => openEditModal(row)}
                   >
                     Edit
                   </Button>
@@ -72,6 +119,15 @@ export default function Products() {
             /> 
           </Table>
         </div>
+
+        <ProductFormModal
+          isOpen={modalMode !== null}
+          onClose={closeModal}
+          onSubmit={modalMode === "create" ? handleCreate : handleEdit}
+          initialData={selectedProduct ?? { name: "", price: 0 }}
+          mode={modalMode === "edit" ? "edit" : "create"}
+        />
+
       </CardBox>
     </>
   );
