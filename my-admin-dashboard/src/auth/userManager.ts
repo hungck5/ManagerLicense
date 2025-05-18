@@ -1,15 +1,15 @@
 import { UserManager, WebStorageStateStore } from "oidc-client-ts";
 
 const oidcConfig = {
-  authority: "https://localhost:7130/auth",
-  client_id: "react_client",
-  redirect_uri: "https://localhost:3001/callback",
-  post_logout_redirect_uri: "https://localhost:3001/dashboard",
-  response_type: "code",
-  scope: "openid profile email offline_access",
+  authority: import.meta.env.VITE_AUTHORITY_URL,
+  client_id: import.meta.env.VITE_CLIENT_ID,
+  redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+  post_logout_redirect_uri: import.meta.env.VITE_POST_LOGOUT_REDIRECT_URI,
+  response_type: import.meta.env.VITE_RESPONSE_TYPE,
+  scope: import.meta.env.VITE_SCOPE,
   stateStore: new WebStorageStateStore({ store: window.localStorage }),
   userStore: new WebStorageStateStore({ store: window.localStorage }),
-  code_challenge_method: 'S256',
+  code_challenge_method: import.meta.env.VITE_CODE_CHALLENGE_METHOD,
 };
 
 export const userManager = new UserManager(oidcConfig);

@@ -1,4 +1,4 @@
-// start-dev.ts
+
 import { spawn } from 'child_process';
 
 function run(command: string, args: string[]) {
@@ -9,6 +9,5 @@ function run(command: string, args: string[]) {
   });
 }
 
-// Chạy 2 tiến trình song song
 run('pnpm', ['run', 'dev-http']);
 run('pnpm', ['run', 'dev-https']);

@@ -3,17 +3,10 @@ import CardBox from "@/components/cardBox";
 import { Input } from "@/components/input";
 import { Table } from "@/components/table";
 import { Column } from "@/components/table/Column";
-import { useState } from "react";
-import CreateProductModal from "./CreateProductModal";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import ProductFormModal from "./ProductModal";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-}
+import { getProducts, Product } from "@/services/productService";
 
 const mockData: Product[] = [
   { id: uuidv4(), name: "Apple", price: 1.2, stock: 10 },
@@ -33,6 +26,22 @@ export default function Products() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<Product[]>(productsMock);
   const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: number } | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to fetch products", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filteredData = mockData.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
@@ -63,7 +72,6 @@ export default function Products() {
   const openCreateModal = () => {
     setSelectedProduct(null);
     setModalMode("create");
-    console.log("Create product pop");
   };
 
   const openEditModal = (product: Product) => {
