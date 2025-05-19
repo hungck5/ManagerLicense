@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using EcommerceApi.Data;
+using EcommerceApi.Db;
 using EcommerceApi.Models;
 using EcommerceApi.Services.Interfaces;
 using EcommerceApi.DTOs;

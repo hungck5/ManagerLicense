@@ -1,8 +1,9 @@
 namespace EcommerceApi.Models;
+
 public class Product
 {
   public Product() { }
-  
+
   public Product(Guid id,
                  string name,
                  string unit,
@@ -32,8 +33,6 @@ public class Product
     Price = price;
     Image = image;
     Category = category;
-    CreatedDate = DateTime.UtcNow;
-    UpdatedDate = DateTime.UtcNow;
   }
 
   public Guid Id { get; private set; }
@@ -50,6 +49,6 @@ public class Product
   public decimal Price { get; private set; }
   public string Image { get; private set; }
   public string Category { get; private set; }
-  public DateTime CreatedDate { get; private set; }
-  public DateTime UpdatedDate { get; private set; }
+  
+  public SeoMeta SeoMeta { get; set; }
 }
