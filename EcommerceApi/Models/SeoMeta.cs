@@ -1,6 +1,8 @@
+using EcommerceApi.Framework.Domain;
+
 namespace EcommerceApi.Models;
 
-public class SeoMeta
+public class SeoMeta : AggregateRoot
 {
     public string MetaTitle { get; set; }
     public string MetaDescription { get; set; }
@@ -15,7 +17,7 @@ public class SeoMeta
     public string Slug { get; set; }
     public string? Title { get; set; }
     public string? ContentHtml { get; set; }
-
-    public string EntityType { get; set; } = null!;
-    public Guid EntityId { get; set; }
+    public MenuItem? MenuItem { get; set; }
+    public ProductCategory? ProductCategory { get; set; }
+    public Product? Product { get; set; }
 }

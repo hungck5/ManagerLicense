@@ -1,8 +1,14 @@
+using EcommerceApi.Framework.Domain;
+
 namespace EcommerceApi.Models;
 
-public class ProductCategory
+public class ProductCategory : AggregateRoot
 {
-    public ProductCategory() { }
+    public ProductCategory()
+    { 
+        Products = new HashSet<Product>();
+        SeoMeta = new SeoMeta();
+    }
 
     public ProductCategory(Guid id,
                             string name,
@@ -15,9 +21,11 @@ public class ProductCategory
         Image = image;
     }
 
-    public Guid Id { get; private set; }
-    public string Name { get; private set; }
-    public string Description { get; private set; }
-    public string Image { get; private set; }
-    public SeoMeta SeoMeta { get; private set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string Image { get; set; }
+    public SeoMeta? SeoMeta { get; set; }
+    public Guid? SeoMetaId { get; set; }
+
+    public ICollection<Product> Products { get; set; }
 }

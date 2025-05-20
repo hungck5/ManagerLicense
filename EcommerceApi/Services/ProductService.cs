@@ -27,7 +27,7 @@ public class ProductService : IProductService
 
     public async Task<Product> CreateAsync(ProductDTO product)
     {
-        var newProduct = new Product(Guid.NewGuid(),
+        var newProduct = new Product(
                                      product.Name,
                                      product.Unit,
                                      product.VAT,
@@ -39,8 +39,7 @@ public class ProductService : IProductService
                                      product.Notes,
                                      product.Description,
                                      product.Price,
-                                     product.Image,
-                                     product.Category);
+                                     product.Image);
         
         _context.Products.Add(newProduct);
         await _context.SaveChangesAsync();

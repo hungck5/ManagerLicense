@@ -15,5 +15,8 @@ public class ApplicationDbContext : DbContext
     base.OnModelCreating(modelBuilder);
 
     ProductModelBuilders.Build(modelBuilder);
+    ProductCategoryModelBuilder.Build(modelBuilder);
+    SeoMetaModelBuilder.Build(modelBuilder);
+    MenuItemModelBuilder.Build(modelBuilder);
   }
 }

@@ -6,6 +6,9 @@ public static class ProductModelBuilders
     public static void Build(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Product>()
+            .HasKey(p => p.Id);
+
+        modelBuilder.Entity<Product>()
             .Property(p => p.Name)
             .IsRequired()
             .HasMaxLength(100);
@@ -61,8 +64,14 @@ public static class ProductModelBuilders
             .HasMaxLength(250);
 
         modelBuilder.Entity<Product>()
-            .Property(p => p.Category)
-            .IsRequired()
-            .HasMaxLength(100);
+            .HasOne(p => p.ProductCategory)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.ProductCategoryId);
+
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.SeoMeta)
+            .WithOne(s => s.Product)
+            .HasForeignKey<Product>(p => p.SeoMetaId)
+            .IsRequired(false);
     }
 }
