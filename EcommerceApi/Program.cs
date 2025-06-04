@@ -20,6 +20,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<ApplicationDbContext>();
 
 var app = builder.Build();

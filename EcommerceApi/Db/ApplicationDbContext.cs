@@ -9,6 +9,9 @@ public class ApplicationDbContext : DbContext
   : base(options) {}
 
   public DbSet<Product> Products => Set<Product>();
+  public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
+  public DbSet<SeoMeta> SeoMetas => Set<SeoMeta>();
+  public DbSet<MenuItem> MenuItems => Set<MenuItem>();
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
