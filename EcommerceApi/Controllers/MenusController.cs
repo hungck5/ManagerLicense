@@ -3,7 +3,7 @@ using EcommerceApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using EcommerceApi.DTOs;
 
-namespace YourApp.Controllers;
+namespace EcommerceApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

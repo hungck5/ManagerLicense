@@ -4,7 +4,12 @@ namespace EcommerceApi.Models;
 
 public class MenuItem : AggregateRoot
 {
-    public MenuItem( Guid id, string label, SeoMeta? seoMeta, int order, int? parentId = null )
+    public MenuItem()
+    {
+        SeoMeta = new SeoMeta();
+    }
+    
+    public MenuItem(Guid id, string label, SeoMeta? seoMeta, int order, int? parentId = null)
     {
         Id = id;
         Label = label;

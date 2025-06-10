@@ -61,7 +61,7 @@ namespace EcommerceApi.Migrations
                     b.HasIndex("SeoMetaId")
                         .IsUnique();
 
-                    b.ToTable("MenuItem");
+                    b.ToTable("MenuItems");
                 });
 
             modelBuilder.Entity("EcommerceApi.Models.Product", b =>
@@ -185,7 +185,7 @@ namespace EcommerceApi.Migrations
                         .IsUnique()
                         .HasFilter("[SeoMetaId] IS NOT NULL");
 
-                    b.ToTable("ProductCategory");
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("EcommerceApi.Models.SeoMeta", b =>
@@ -266,7 +266,7 @@ namespace EcommerceApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SeoMeta");
+                    b.ToTable("SeoMetas");
                 });
 
             modelBuilder.Entity("EcommerceApi.Models.MenuItem", b =>
