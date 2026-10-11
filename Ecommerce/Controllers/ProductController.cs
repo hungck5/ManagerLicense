@@ -16,7 +16,7 @@ public class ProductController : Controller
   public IActionResult Index()
   {
     // var products = _productService.GetAllProducts();
-    return View();
+    return View("index");
   }
 
   // [HttpGet("{id}")]
@@ -38,6 +38,6 @@ public class ProductController : Controller
         // {
         //     return NotFound();
         // }
-        return View();
+        return View("detail");
     }
 }

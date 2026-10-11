@@ -21,9 +21,15 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<ApplicationDbContext>();
 
 var app = builder.Build();
+if (app.Configuration.GetValue<bool>("Database:Initialize"))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.EnsureCreatedAsync();
+}
 app.UseCors("AllowAll");
 if (app.Environment.IsDevelopment())
 {

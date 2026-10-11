@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
+var allowHttp = builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Auth:AllowHttp");
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
   options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -14,12 +15,14 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(options =>
 {
   options.Cookie.HttpOnly = true;
-  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+  options.Cookie.SecurePolicy = allowHttp ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
   options.SlidingExpiration = true;
 })
 .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
 {
-  options.Authority = "https://localhost:7130/auth";
+  options.Authority = builder.Configuration["Auth:Authority"] ?? "https://localhost:7130/auth";
+  if (builder.Configuration["Auth:InternalAuthority"] is { } internalAuthority)
+    options.BackchannelHttpHandler = new DockerBackchannelHandler(new Uri(options.Authority), new Uri(internalAuthority));
   options.ClientId = "ecommerce_app";
   options.ResponseType = "code";
   options.UsePkce = true;
@@ -32,8 +35,16 @@ builder.Services.AddAuthentication(options =>
   options.Scope.Add("openid");
   options.Scope.Add("profile");
   options.Scope.Add("email");
-  options.GetClaimsFromUserInfoEndpoint = true;
-  options.RequireHttpsMetadata = true;
+  options.GetClaimsFromUserInfoEndpoint = false;
+  options.RequireHttpsMetadata = !allowHttp;
+  if (allowHttp)
+  {
+    options.ResponseMode = "query";
+    options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+    options.NonceCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.NonceCookie.SameSite = SameSiteMode.Lax;
+  }
 
   options.Events = new OpenIdConnectEvents
   {
@@ -47,6 +58,11 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+if (app.Configuration.GetValue<bool>("Database:Initialize"))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.EnsureCreatedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -63,12 +79,12 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapControllerRoute(
-    name: "slug",
-    pattern: "{*slug}",
-    defaults: new { controller = "Page", action = "RenderPage" });
-app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+app.MapControllerRoute(
+    name: "slug",
+    pattern: "{*slug}",
+    defaults: new { controller = "Page", action = "RenderPage" });
 
 app.Run();

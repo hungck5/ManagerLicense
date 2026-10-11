@@ -6,12 +6,16 @@ using LicenseManagerApp.Models;
 
 public class LicenseController : Controller
 {
-    private static readonly string PrivateKeyPath = "private.pem";
-    private static readonly string PublicKeyPath = "public.pem";
+    private readonly string PrivateKeyPath;
+    private readonly string PublicKeyPath;
     private static List<License> licenses = new();
 
-    public LicenseController()
+    public LicenseController(IConfiguration configuration)
     {
+        var directory = configuration["License:KeyDirectory"] ?? ".";
+        Directory.CreateDirectory(directory);
+        PrivateKeyPath = Path.Combine(directory, "private.pem");
+        PublicKeyPath = Path.Combine(directory, "public.pem");
         EnsureKeyFilesExist();
     }
 

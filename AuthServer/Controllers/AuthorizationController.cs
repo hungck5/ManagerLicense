@@ -57,13 +57,13 @@ public class AuthorizationController : Controller
         var request = HttpContext.GetOpenIddictServerRequest() ??
                     throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        if (request.IsAuthorizationCodeGrantType())
+        if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
             var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             var user = await _userManager.GetUserAsync(authenticateResult.Principal);
             var principal = await _signInManager.CreateUserPrincipalAsync(user);
 
-            principal.SetScopes(request.GetScopes());
+            principal.SetScopes(authenticateResult.Principal!.GetScopes());
             principal.SetResources("resource_server");
 
             principal.SetDestinations(claim =>

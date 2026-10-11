@@ -4,3 +4,6 @@
 
 */appsettings.Development.json
 */dist/
+**/node_modules/
+.env
+.docker-local/

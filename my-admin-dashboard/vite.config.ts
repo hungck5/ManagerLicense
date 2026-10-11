@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 import fs from 'fs';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -16,10 +16,10 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    https: {
+    https: command === 'serve' && fs.existsSync(path.resolve(__dirname, './certs/localhost-key.pem')) ? {
       key: fs.readFileSync(path.resolve(__dirname, './certs/localhost-key.pem')),
       cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost-cert.pem')),
-    },
+    } : undefined,
     host: '0.0.0.0'
   },
-});
+}));

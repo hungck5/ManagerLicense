@@ -15,14 +15,16 @@ public class LicenseVerifierService : IHostedService, IDisposable
 	private readonly LicenseSettings _settings;
 	private readonly ILogger<LicenseVerifierService> _logger;
 	private string _publicKeyCache;
+	private readonly string _licensePath;
 
 	public LicenseVerifierService(IHttpClientFactory httpClientFactory, IWebHostEnvironment env,
-																IOptions<LicenseSettings> options, ILogger<LicenseVerifierService> logger)
+																IOptions<LicenseSettings> options, ILogger<LicenseVerifierService> logger, IConfiguration configuration)
 	{
 		_httpClientFactory = httpClientFactory;
 		_env = env;
 		_settings = options.Value;
 		_logger = logger;
+		_licensePath = configuration["License:FilePath"] ?? Path.Combine(_env.ContentRootPath, "license.json");
 	}
 
 	public Task StartAsync(CancellationToken cancellationToken)
@@ -34,7 +36,7 @@ public class LicenseVerifierService : IHostedService, IDisposable
 	private async void DoWork(object state)
 	{
 		_logger.LogInformation("License verification started at: {time}", DateTimeOffset.Now);
-		var licensePath = Path.Combine(_env.ContentRootPath, "license.json");
+		var licensePath = _licensePath;
 		string licenseContent = null;
 
 		if (!File.Exists(licensePath))

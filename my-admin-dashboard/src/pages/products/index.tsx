@@ -4,27 +4,16 @@ import { Input } from "@/components/input";
 import { Table } from "@/components/table";
 import { Column } from "@/components/table/Column";
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from 'uuid';
 import ProductFormModal from "./ProductModal";
 import { getProducts, Product } from "@/services/productService";
 
-const mockData: Product[] = [
-  { id: uuidv4(), name: "Apple", price: 1.2, stock: 10 },
-  { id: uuidv4(), name: "Banana", price: 0.8, stock: 20 },
-  { id: uuidv4(), name: "Orange", price: 1.5, stock: 15 },
-];
-
-const productsMock: Product[] = [
-    { id: uuidv4(), name: "Product A", price: 100, stock: 5 },
-    { id: uuidv4(), name: "Product B", price: 150, stock: 10 },
-  ];
 type ModalMode = 'create' | 'edit' | null;
 
 export default function Products() {
   const [modalMode, setModalMode] = useState<ModalMode>(null);
   //const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [products, setProducts] = useState<Product[]>(productsMock);
+  const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<{ name: string; price: number } | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -43,18 +32,10 @@ export default function Products() {
     fetchData();
   }, []);
 
-  const filteredData = mockData.filter((p) =>
+  const filteredData = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleCreateProduct = (product: { name: string; price: number; stock: number }) => {
-    const newProduct = {
-      id: uuidv4(),
-      ...product,
-    };
-    
-    setProducts((prev) => [...prev, newProduct]);
-  };
 
 
   const handleCreate = (product: { name: string; price: number }) => {
@@ -99,7 +80,7 @@ export default function Products() {
               + Create
             </Button>
           </div>
-          <Table keyField="id" data={products}>
+          <Table keyField="id" data={filteredData} emptyText={isLoading ? "Loading..." : "No data"}>
             <Column header="ID" accessor="id" />
             <Column header="Name" accessor="name" />
             <Column header="Price" accessor="price" render={(v) => `$${v}`} />

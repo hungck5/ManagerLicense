@@ -9,16 +9,20 @@ public static class OpenIddictSeeder
     using var scope = serviceProvider.CreateScope();
     var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
     var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var ecommerceUrl = new Uri(configuration["Auth:EcommerceUrl"] ?? "https://localhost:7294/");
+    var reactUrl = new Uri(configuration["Auth:ReactUrl"] ?? "https://localhost:3001/");
 
     if (await manager.FindByClientIdAsync("ecommerce_app") is null)
     {
       await manager.CreateAsync(new OpenIddictApplicationDescriptor
       {
         ClientId = "ecommerce_app",
+        ClientType = ClientTypes.Public,
         ConsentType = ConsentTypes.Implicit,
         DisplayName = "Ecommerce Web App",
-        PostLogoutRedirectUris = { new Uri("https://localhost:7294/signout-callback-oidc") },
-        RedirectUris = { new Uri("https://localhost:7294/signin-oidc") },
+        PostLogoutRedirectUris = { new Uri(ecommerceUrl, "signout-callback-oidc") },
+        RedirectUris = { new Uri(ecommerceUrl, "signin-oidc") },
         Permissions =
             {
                 Permissions.Endpoints.Authorization,
@@ -29,7 +33,7 @@ public static class OpenIddictSeeder
                 Scopes.OpenId,
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Email,
-                "ecommerce_api"
+                Permissions.Prefixes.Scope + "ecommerce_api"
             },
         Requirements =
             {
@@ -57,24 +61,25 @@ public static class OpenIddictSeeder
                 ClientType = ClientTypes.Public,                
                 PostLogoutRedirectUris =
                 {
-                    new Uri("https://localhost:3001/"),
+                    reactUrl,
                 },
                 RedirectUris =
                 {
-                    new Uri("https://localhost:3001/callback"),
+                    new Uri(reactUrl, "callback"),
                 },
                 Permissions =
                 {
                     Permissions.Endpoints.Authorization,
                     Permissions.Endpoints.Token,
+                    Permissions.Endpoints.EndSession,
                     Permissions.GrantTypes.AuthorizationCode,
+                    Permissions.GrantTypes.RefreshToken,
                     Permissions.ResponseTypes.Code,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Roles,
-                    Scopes.OfflineAccess,
-                    Scopes.OfflineAccess,
-                    "ecommerce_api",
+                    Permissions.Prefixes.Scope + Scopes.OfflineAccess,
+                    Permissions.Prefixes.Scope + "ecommerce_api",
                 },
                 Requirements =
                 {

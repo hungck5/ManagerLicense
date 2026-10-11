@@ -19,7 +19,8 @@ namespace AuthServer.seed
                     EmailConfirmed = true
                 };
 
-                var result = await userManager.CreateAsync(newUser, "Admin@123");
+                var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                var result = await userManager.CreateAsync(newUser, configuration["Auth:AdminPassword"] ?? "Admin@123");
                 if (result.Succeeded)
                 {
                     Console.WriteLine("User created.");

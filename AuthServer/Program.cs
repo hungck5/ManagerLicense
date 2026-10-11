@@ -40,7 +40,7 @@ builder.Services.AddOpenIddict()
 	})
 	.AddServer(options =>
 	{
-		options.SetIssuer(new Uri("https://localhost:7130/"));
+		options.SetIssuer(new Uri(builder.Configuration["Auth:Issuer"] ?? "https://localhost:7130/"));
 		options.SetTokenEndpointUris("/connect/token")
 			.SetAuthorizationEndpointUris("/connect/authorize")
 			.SetEndSessionEndpointUris("/connect/logout")
@@ -69,6 +69,9 @@ builder.Services.AddOpenIddict()
 			.EnableAuthorizationEndpointPassthrough()
 			.EnableEndSessionEndpointPassthrough();
 
+        if (builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Auth:AllowHttp"))
+            options.UseAspNetCore().DisableTransportSecurityRequirement();
+
 	})
 	.AddValidation(options =>
 	{
@@ -92,15 +95,17 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
   builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, CustomClaimsPrincipalFactory>();
 
 var app = builder.Build();
+if (app.Configuration.GetValue<bool>("Database:Initialize"))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.EnsureCreatedAsync();
+}
 app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseForwardedHeaders(forwardedHeadersOptions);
-app.UseWhen(ctx => !ctx.Request.Path.StartsWithSegments("/connect/authorize"), subApp =>
-{
-	subApp.UseAuthentication();
-	subApp.UseAuthorization();
-});
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 await OpenIddictSeeder.SeedAsync(app.Services);
