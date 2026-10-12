@@ -1,18 +1,20 @@
 import { BaseEditor, Descendant } from "slate";
 import { ReactEditor } from "slate-react";
+import { HistoryEditor } from "slate-history";
 
 export type CustomText = { 
   text: string; 
   bold?: boolean; 
   italic?: boolean;
   underline?: boolean; 
-  [key: string]: any;
+  strikethrough?: boolean;
 };
 
-type CustomElement = { type: "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6"; children: Descendant[] };
+export type BlockType = "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote" | "bulleted-list" | "numbered-list" | "list-item";
+export type CustomElement = { type: BlockType; children: Descendant[] };
 declare module 'slate' {
   interface CustomTypes {
-    Editor: BaseEditor & ReactEditor;
+    Editor: BaseEditor & ReactEditor & HistoryEditor;
     Element: CustomElement;
     Text: CustomText;
   }
