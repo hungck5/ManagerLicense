@@ -15,23 +15,23 @@ export default function Layout() {
     <div className="flex h-screen bg-gray-100">
       <aside
         className={`
-          ${isSidebarOpen ? "w-64 p-4" : "w-16 p-2"} 
-          bg-white shadow-md transition-all duration-300`}
+          ${isSidebarOpen ? "w-64" : "w-16"}
+          shrink-0 bg-white p-2 shadow-md transition-[width] duration-300 ease-in-out motion-reduce:transition-none`}
       >
-        <div className={`flex items-center gap-2 mb-4 border-b border-gray-200
-          ${isSidebarOpen ? "justify-start p-4 my-[-2px]" : "justify-center py-3 min-h-[71px]"}
-          `}>
-          <img src={ReactLogo} alt="Logo" className="w-8 h-8 object-contain" />
-          {isSidebarOpen && <span className="text-xl font-bold">Admin</span>}
+        <div className="mb-4 flex h-[72px] items-center gap-2 overflow-hidden border-b border-gray-200 px-2">
+          <img src={ReactLogo} alt="Logo" className="h-8 w-8 shrink-0 object-contain" />
+          <span className="sidebar-label text-xl font-bold" data-visible={isSidebarOpen} aria-hidden={!isSidebarOpen}>Admin</span>
         </div>
         
         <Sidebar isSidebarOpen={isSidebarOpen} />
       </aside>
 
-      <main className="flex-1 flex flex-col">
+      <main className="min-w-0 flex-1 flex flex-col">
         <header className="flex items-center justify-between bg-white shadow px-6 py-4">
           <button
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
+            onClick={() => setSidebarOpen((open) => !open)}
+            aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            aria-expanded={isSidebarOpen}
             className="mr-4 text-gray-600 hover:text-gray-900"
           >
             <Menu />

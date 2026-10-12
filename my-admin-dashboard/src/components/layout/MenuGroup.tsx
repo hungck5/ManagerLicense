@@ -1,5 +1,5 @@
 import { ReactNode, useState, useEffect } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Children, cloneElement, isValidElement } from "react";
 
 interface MenuGroupProps {
@@ -16,7 +16,7 @@ export function MenuGroup({ label, icon, children, isSidebarOpen }: MenuGroupPro
 
   useEffect(() => {
     if (!isSidebarOpen) {
-      setOpen(false);
+      setHovering(false);
     }
   }, [isSidebarOpen]);
 
@@ -24,43 +24,46 @@ export function MenuGroup({ label, icon, children, isSidebarOpen }: MenuGroupPro
     <li
       className="relative group"
       onMouseEnter={() => !isSidebarOpen && setHovering(true)}
-      onMouseLeave={() => !isSidebarOpen && setHovering(false)}
+      onMouseLeave={() => setHovering(false)}
     >
       <button
-        onClick={() => setOpen(!open)}
-        className={`flex items-center w-full gap-2 px-2 py-2 rounded hover:bg-gray-200 transition-colors justify-start`}
-        aria-expanded={open}
+        onClick={() => isSidebarOpen ? setOpen((expanded) => !expanded) : setHovering(true)}
+        className="relative flex items-center w-full gap-2 overflow-hidden px-2 py-2 rounded hover:bg-gray-200 transition-colors justify-start"
+        aria-label={label}
+        title={!isSidebarOpen ? label : undefined}
+        aria-expanded={showSubmenu}
       >
-        <span className="text-gray-700">{icon}</span>
-        {isSidebarOpen && (
-          <>
-            <span className="flex-1 text-left font-medium text-gray-800">{label}</span>
-            <span className={`transition-transform duration-300 
-                ${open ? "rotate-180" : "rotate-0"}
-                `}
-            >
-              <ChevronDown size={18} />
-            </span>
-          </>
-        )}
-        {!isSidebarOpen && 
-          <span className="ml-auto text-gray-500">
-          <ChevronRight size={18} />
-          </span>
-        }
+        <span className="flex w-5 shrink-0 items-center justify-center text-gray-700">{icon}</span>
+        <span className="sidebar-label flex-1 pr-5 text-left font-medium text-gray-800" data-visible={isSidebarOpen} aria-hidden={!isSidebarOpen}>{label}</span>
+        <span className={`absolute right-2 transition-[opacity,transform] duration-300 ease-in-out motion-reduce:transition-none ${isSidebarOpen ? "opacity-100" : "opacity-0"} ${open ? "rotate-180" : "rotate-0"}`} aria-hidden="true">
+          <ChevronDown size={18} />
+        </span>
       </button>
 
-      <ul className={`overflow-hidden
-          ${isSidebarOpen ? "transition-all duration-300 ease-in-out pl-4 mt-1 space-y-1" : "transition-none absolute left-full top-0 mt-1 w-48 shadow-md rounded z-10 bg-white border border-gray-300"} 
-          ${showSubmenu ? "max-h-[500px] opacity-100 pointer-events-auto" : "max-h-0 opacity-0 pointer-events-none"}
-        `}>
-        {showSubmenu &&
-          Children.map(children, (child) =>
+      <div
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out motion-reduce:transition-none ${isSidebarOpen && open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+        aria-hidden={!isSidebarOpen || !open}
+        inert={!isSidebarOpen || !open}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <ul className="space-y-1 pt-1 pl-4">
+            {Children.map(children, (child) =>
+              isValidElement(child)
+                ? cloneElement(child as React.ReactElement<any>, { forceShowLabel: true })
+                : child
+            )}
+          </ul>
+        </div>
+      </div>
+      {!isSidebarOpen && hovering && (
+        <ul className="absolute left-full top-0 z-10 w-48 space-y-1 rounded border border-gray-300 bg-white p-1 shadow-md">
+          {Children.map(children, (child) =>
             isValidElement(child)
               ? cloneElement(child as React.ReactElement<any>, { forceShowLabel: true })
               : child
           )}
-      </ul>
+        </ul>
+      )}
     </li>
   );
 }

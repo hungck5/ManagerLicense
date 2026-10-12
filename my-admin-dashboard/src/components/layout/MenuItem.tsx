@@ -16,14 +16,16 @@ export function MenuItem({ to, icon, label, isSidebarOpen, forceShowLabel = fals
     <li>
       <NavLink
         to={to}
+        aria-label={label}
+        title={!shouldShowLabel ? label : undefined}
         className={({ isActive }) =>
-          `flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-200 text-gray-800 justify-start
+          `flex items-center gap-2 overflow-hidden px-2 py-2 rounded hover:bg-gray-200 text-gray-800 justify-start
           ${isActive ? "bg-gray-100 font-semibold" : ""} 
           `
         }
       >
-        {icon}
-        {shouldShowLabel && <span>{label}</span>}
+        {icon && <span className="flex w-5 shrink-0 items-center justify-center">{icon}</span>}
+        <span className="sidebar-label flex-1" data-visible={shouldShowLabel} aria-hidden={!shouldShowLabel}>{label}</span>
       </NavLink>
     </li>
   );
