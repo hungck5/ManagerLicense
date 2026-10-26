@@ -16,8 +16,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        var status = LicenseVerifierService.Status;
-        return View(status);
+        //var status = LicenseVerifierService.Status;
+        return View();
     }
 
     public IActionResult Privacy()

@@ -58,6 +58,18 @@ services:
     depends_on:
       sqlserver: { condition: service_healthy }
 
+  article-service:
+    <<: *dotnet
+    build:
+      context: .
+      args: { PROJECT: ArticleService }
+    environment:
+      <<: *dotnet-env
+      ConnectionStrings__DefaultConnection: Server=sqlserver;Database=ArticleService;User Id=sa;Password=${SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True
+      Database__Initialize: "true"
+    depends_on:
+      sqlserver: { condition: service_healthy }
+
   api-gateway:
     <<: *dotnet
     build:
@@ -69,9 +81,11 @@ services:
       Cors__FrontendOrigin: http://localhost:3000
       ReverseProxy__Clusters__api_cluster__Destinations__api_service__Address: http://ecommerce-api:8080/
       ReverseProxy__Clusters__auth_cluster__Destinations__auth_service__Address: http://auth-server:8080/
+      ReverseProxy__Clusters__article_cluster__Destinations__article_service__Address: http://article-service:8080/
     depends_on:
       auth-server: { condition: service_healthy }
       ecommerce-api: { condition: service_healthy }
+      article-service: { condition: service_healthy }
 
   admin-dashboard:
     build: ./my-admin-dashboard
@@ -117,10 +131,12 @@ services:
     environment:
       <<: *dotnet-env
       ApiSettings__BaseUrl: http://license-manager:8080
+      ArticleApi__BaseUrl: http://api-gateway:8080/api
       License__FilePath: /app/data/license.json
     volumes: ["mvc-data:/app/data"]
     depends_on:
       license-manager: { condition: service_healthy }
+      api-gateway: { condition: service_healthy }
 
   product-test:
     <<: *dotnet

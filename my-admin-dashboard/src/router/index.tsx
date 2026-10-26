@@ -6,10 +6,11 @@ import LoginPage from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
 import CallbackPage from "@/pages/CallbackPage";
 import Products from "@/pages/products";
+import Articles from "@/pages/articles";
 import Users from "@/pages/users";
 import { AuthProvider } from "@/auth/auth-context";
 import PrivateRoute from "@/router/private-router";
-import { CALLBACK, DASHBOARD, HOME, LOGIN, NOT_FOUND, PRODUCTS, SETTINGS, USERS } from "@/constants/router-constants";
+import { ARTICLES, CALLBACK, DASHBOARD, HOME, LOGIN, NOT_FOUND, PRODUCTS, SETTINGS, USERS } from "@/constants/router-constants";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: PRODUCTS,
         element: <Products />,
+      },
+      {
+        path: ARTICLES,
+        element: <Articles />,
       },
       {
         path: USERS,

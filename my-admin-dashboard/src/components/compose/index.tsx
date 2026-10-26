@@ -7,7 +7,7 @@ import type { RenderElementProps, RenderLeafProps } from "slate-react";
 import { withHistory } from "slate-history";
 import { Bold, Italic, Underline, Strikethrough, List, ListOrdered, Quote, Undo2, Redo2, Download } from "lucide-react";
 import { Button } from "./Button";
-import { contentToHtml, emptyContent, escapeHtml, isBlockActive, isList, isMarkActive, parseDraft, plainText, toggleBlock, toggleMark } from "./editor-utils";
+import { contentToHtml, emptyContent, escapeHtml, htmlToContent, isBlockActive, isList, isMarkActive, parseDraft, plainText, toggleBlock, toggleMark } from "./editor-utils";
 import type { ArticleDraft, Mark } from "./editor-utils";
 import type { BlockType } from "@/types/slate-custom-types";
 
@@ -135,6 +135,31 @@ export function ComposeEditor({ draftKey = "article-draft:local" }: { draftKey?:
         <span>{wordCount} từ · {text.length} ký tự</span>
       </div>
     </section>
+  );
+}
+
+/** A controlled, compact version of the dashboard composer for article forms. */
+export function ArticleContentEditor({ initialHtml, onChange }: { initialHtml: string; onChange: (html: string) => void }) {
+  const [editor] = useState(() => withReact(withHistory(createEditor())));
+  const [initial] = useState<Descendant[]>(() => htmlToContent(initialHtml));
+  const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
+  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, []);
+
+  return (
+    <div className="overflow-hidden rounded-md border border-gray-300 bg-white">
+      <Slate editor={editor} initialValue={initial} onChange={value => {
+        if (editor.operations.some(operation => operation.type !== "set_selection")) onChange(contentToHtml(value));
+      }}>
+        <Toolbar />
+        <Editable
+          renderLeaf={renderLeaf}
+          renderElement={renderElement}
+          aria-label="Nội dung bài viết"
+          placeholder="Bắt đầu viết nội dung bài viết…"
+          className="min-h-64 px-4 py-3 leading-7 text-gray-800 outline-none"
+        />
+      </Slate>
+    </div>
   );
 }
 

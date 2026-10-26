@@ -100,3 +100,32 @@ export function contentToHtml(content: Descendant[]): string {
     return `<${tag}>${contentToHtml(node.children) || "<br>"}</${tag}>`;
   }).join("");
 }
+
+/** Converts HTML previously emitted by contentToHtml back into Slate blocks. */
+export function htmlToContent(html: string): Descendant[] {
+  if (!html.trim()) return emptyContent();
+  const document = new DOMParser().parseFromString(html, "text/html");
+  const deserialize = (node: globalThis.Node, marks: Record<string, boolean> = {}): Descendant[] => {
+    if (node.nodeType === globalThis.Node.TEXT_NODE) return [{ text: node.textContent ?? "", ...marks }];
+    if (node.nodeType !== globalThis.Node.ELEMENT_NODE) return [];
+    const element = node as HTMLElement;
+    const tag = element.tagName.toLowerCase();
+    const nextMarks = { ...marks };
+    if (tag === "strong" || tag === "b") nextMarks.bold = true;
+    if (tag === "em" || tag === "i") nextMarks.italic = true;
+    if (tag === "u") nextMarks.underline = true;
+    if (tag === "s" || tag === "del") nextMarks.strikethrough = true;
+    if (tag === "br") return [{ text: "\n", ...marks }];
+    const children = Array.from(element.childNodes).flatMap(child => deserialize(child, nextMarks));
+    const blockTags: Record<string, BlockType> = { p: "paragraph", h1: "h1", h2: "h2", h3: "h3", h4: "h4", h5: "h5", h6: "h6", blockquote: "blockquote", li: "list-item" };
+    if (tag === "ul" || tag === "ol") {
+      const listChildren = children.filter(child => Element.isElement(child) && child.type === "list-item");
+      return [{ type: tag === "ul" ? "bulleted-list" : "numbered-list", children: listChildren.length ? listChildren : [{ type: "list-item", children: [{ text: "" }] }] } as Descendant];
+    }
+    if (blockTags[tag]) return [{ type: blockTags[tag], children: children.length ? children : [{ text: "" }] } as Descendant];
+    return children;
+  };
+  const result = Array.from(document.body.childNodes).flatMap(node => deserialize(node));
+  const blocks = result.filter(node => Element.isElement(node) && node.type !== "list-item");
+  return blocks.length ? blocks : [{ type: "paragraph", children: result.length ? result : [{ text: "" }] }];
+}

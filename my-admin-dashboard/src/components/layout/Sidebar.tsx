@@ -31,6 +31,7 @@ export function Sidebar({ isSidebarOpen }: SidebarProps) {
           </MenuGroup>
           <MenuItem to="/users" label="Users" icon={<User size={20} />} isSidebarOpen={isSidebarOpen} />
           <MenuItem to="/products" label="Products" icon={<Package size={20} />} isSidebarOpen={isSidebarOpen} />
+          <MenuItem to="/articles" label="Articles" icon={<FileText size={20} />} isSidebarOpen={isSidebarOpen} />
 
           <MenuItem to="/settings" label="Settings" icon={<Settings size={20} />} isSidebarOpen={isSidebarOpen} />
         </ul>

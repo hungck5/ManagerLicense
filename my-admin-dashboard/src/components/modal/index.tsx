@@ -7,9 +7,10 @@ interface BaseModalProps {
   title?: string;
   children: ReactNode;
   footer?: ReactNode;
+  size?: "md" | "lg";
 }
 
-export default function Modal({ isOpen, onClose, title, children, footer }: BaseModalProps) {
+export default function Modal({ isOpen, onClose, title, children, footer, size = "md" }: BaseModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -19,7 +20,7 @@ export default function Modal({ isOpen, onClose, title, children, footer }: Base
     >
       <div className="absolute inset-0 bg-slate-200/30 backdrop-blur-sm" />
       <div
-        className="relative bg-white rounded-lg w-full max-w-md p-6 shadow-lg"
+        className={`relative bg-white rounded-lg w-full ${size === "lg" ? "max-w-4xl" : "max-w-md"} p-6 shadow-lg`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

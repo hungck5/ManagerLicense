@@ -1,0 +1,28 @@
+@model IReadOnlyList<MvcApp.Models.Article>
+@{
+    ViewData["Title"] = "Bài viết";
+    ViewData["MetaDescription"] = "Danh sách bài viết mới nhất.";
+}
+
+<h1 class="mb-4">Bài viết</h1>
+@if (!Model.Any())
+{
+    <p>Chưa có bài viết đã xuất bản.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+    @foreach (var article in Model)
+    {
+        <div class="col">
+            <article class="card h-100">
+                <div class="card-body">
+                    <h2 class="h4"><a asp-action="Detail" asp-route-slug="@article.Slug">@article.Title</a></h2>
+                    <p>@article.Excerpt</p>
+                    <small class="text-muted">@(article.PublishedAt?.ToLocalTime().ToString("dd/MM/yyyy") ?? "")</small>
+                </div>
+            </article>
+        </div>
+    }
+    </div>
+}

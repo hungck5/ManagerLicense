@@ -1,0 +1,25 @@
+@model MvcApp.Models.Article
+@using System.Text.Json
+@{
+    ViewData["Title"] = Model.MetaTitle;
+    ViewData["MetaDescription"] = Model.MetaDescription;
+    ViewData["CanonicalUrl"] = Model.CanonicalUrl;
+    var schema = JsonSerializer.Serialize(new Dictionary<string, object?> {
+        ["@context"] = "https://schema.org", ["@type"] = "Article", ["headline"] = Model.Title,
+        ["description"] = Model.MetaDescription, ["datePublished"] = Model.PublishedAt,
+        ["author"] = new Dictionary<string, string> { ["@type"] = "Person", ["name"] = Model.Author },
+        ["mainEntityOfPage"] = Model.CanonicalUrl
+    });
+}
+@section Head {
+    <script type="application/ld+json">@Html.Raw(schema)</script>
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="@Model.MetaTitle" />
+    <meta property="og:description" content="@Model.MetaDescription" />
+}
+<article class="mx-auto" style="max-width: 800px">
+    <h1>@Model.Title</h1>
+    <p class="lead">@Model.Excerpt</p>
+    <p class="text-muted">@Model.Author · @(Model.PublishedAt?.ToLocalTime().ToString("dd/MM/yyyy"))</p>
+    <div class="article-content">@Html.Raw(Model.Content)</div>
+</article>
