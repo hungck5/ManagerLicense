@@ -30,3 +30,5 @@ app.UseStaticFiles(new StaticFileOptions
 });
 app.MapControllers();
 app.Run();
+
+public partial class Program;
