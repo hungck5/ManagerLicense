@@ -1,5 +1,6 @@
-*/bin/
-*/obj/
+# Build outputs from all .NET projects, including nested test projects.
+**/bin/
+**/obj/
 .vscode/
 
 */appsettings.Development.json
