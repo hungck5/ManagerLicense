@@ -7,3 +7,6 @@
 **/node_modules/
 .env
 .docker-local/
+
+# Runtime article images uploaded through the admin dashboard.
+/ArticleService/wwwroot/articles/
