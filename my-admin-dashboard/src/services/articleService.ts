@@ -24,3 +24,11 @@ export const getArticles = async () => (await api.get<Article[]>("/articles")).d
 export const createArticle = async (article: SaveArticle) => (await api.post<Article>("/articles", article)).data;
 export const updateArticle = async (id: string, article: SaveArticle) => (await api.put<Article>(`/articles/${id}`, article)).data;
 export const deleteArticle = async (id: string) => api.delete(`/articles/${id}`);
+export const uploadArticleImage = async (file: File) => {
+  const body = new FormData();
+  body.append("file", file);
+  const mediaPath = (await api.post<{ url: string }>("/articles/images", body)).data.url;
+  // Persist a public absolute URL: the MVC site cannot resolve a relative URL
+  // against the admin dashboard's host.
+  return new URL(mediaPath, new URL(api.defaults.baseURL ?? "/api", window.location.origin).origin).toString();
+};

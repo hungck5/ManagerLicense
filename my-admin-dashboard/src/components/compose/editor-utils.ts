@@ -4,7 +4,7 @@ import type { BlockType } from "@/types/slate-custom-types";
 
 export type Mark = "bold" | "italic" | "underline" | "strikethrough";
 export type ArticleDraft = { version: 1; title: string; content: Descendant[] };
-const blockTypes: BlockType[] = ["paragraph", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "bulleted-list", "numbered-list", "list-item"];
+const blockTypes: BlockType[] = ["paragraph", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "bulleted-list", "numbered-list", "list-item", "image"];
 
 export function emptyContent(): Descendant[] {
   return [{ type: "paragraph", children: [{ text: "" }] }];
@@ -57,6 +57,10 @@ function validNode(node: unknown, depth = 0): node is Descendant {
   }
   if (!("type" in node) || !blockTypes.includes(node.type as BlockType) || !("children" in node) ||
       !Array.isArray(node.children) || !node.children.length) return false;
+  if (node.type === "image") {
+    const image = node as unknown as { url?: unknown };
+    return typeof image.url === "string" && /^https?:\/\//i.test(image.url) && node.children.every(child => Text.isText(child));
+  }
   return node.children.every(child => validNode(child, depth + 1) &&
     (isList(node.type as BlockType) ? Element.isElement(child) && child.type === "list-item" : Text.isText(child)));
 }
@@ -92,11 +96,15 @@ export function contentToHtml(content: Descendant[]): string {
       if (node.strikethrough) text = `<s>${text}</s>`;
       return text;
     }
-    const tags: Record<BlockType, string> = {
+    if (node.type === "image") {
+      const alt = typeof node.alt === "string" ? escapeHtml(node.alt) : "";
+      return `<figure><img src="${escapeHtml(node.url ?? "")}" alt="${alt}" loading="lazy"></figure>`;
+    }
+    const tags: Record<Exclude<BlockType, "image">, string> = {
       paragraph: "p", h1: "h1", h2: "h2", h3: "h3", h4: "h4", h5: "h5", h6: "h6",
       blockquote: "blockquote", "bulleted-list": "ul", "numbered-list": "ol", "list-item": "li",
     };
-    const tag = tags[node.type];
+    const tag = tags[node.type as Exclude<BlockType, "image">];
     return `<${tag}>${contentToHtml(node.children) || "<br>"}</${tag}>`;
   }).join("");
 }
@@ -116,6 +124,11 @@ export function htmlToContent(html: string): Descendant[] {
     if (tag === "u") nextMarks.underline = true;
     if (tag === "s" || tag === "del") nextMarks.strikethrough = true;
     if (tag === "br") return [{ text: "\n", ...marks }];
+    if (tag === "img") {
+      const url = element.getAttribute("src") ?? "";
+      if (/^https?:\/\//i.test(url)) return [{ type: "image", url, alt: element.getAttribute("alt") ?? "", children: [{ text: "" }] } as Descendant];
+      return [];
+    }
     const children = Array.from(element.childNodes).flatMap(child => deserialize(child, nextMarks));
     const blockTags: Record<string, BlockType> = { p: "paragraph", h1: "h1", h2: "h2", h3: "h3", h4: "h4", h5: "h5", h6: "h6", blockquote: "blockquote", li: "list-item" };
     if (tag === "ul" || tag === "ol") {

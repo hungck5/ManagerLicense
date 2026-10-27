@@ -24,5 +24,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(new StaticFileOptions
+{
+    RequestPath = "/article-media"
+});
 app.MapControllers();
 app.Run();

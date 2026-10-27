@@ -15,8 +15,12 @@ const emptyArticle: SaveArticle = { title: "", slug: "", excerpt: "", content: "
 export default function ArticleModal({ isOpen, onClose, onSubmit, article }: Props) {
   const [data, setData] = useState<SaveArticle>(emptyArticle);
   const [saving, setSaving] = useState(false);
+  const [editorInstance, setEditorInstance] = useState(0);
   useEffect(() => {
     setData(article ? { title: article.title, slug: article.slug, excerpt: article.excerpt, content: article.content, metaTitle: article.metaTitle, metaDescription: article.metaDescription, canonicalUrl: article.canonicalUrl, author: article.author, status: article.status === "Published" ? 1 : article.status === "Draft" ? 0 : article.status } : emptyArticle);
+    // Slate's initialValue is only read when the editor is mounted. Remount it after
+    // loading a different article so an edited article never leaks into a new one.
+    setEditorInstance((current) => current + 1);
   }, [article, isOpen]);
   const update = (key: keyof SaveArticle, value: string) => setData((current) => ({ ...current, [key]: value }));
   const save = async () => {
@@ -29,7 +33,7 @@ export default function ArticleModal({ isOpen, onClose, onSubmit, article }: Pro
       <label>Title<input required value={data.title} onChange={(e) => update("title", e.target.value)} className="w-full border rounded p-2" /></label>
       <label>Slug <span className="text-xs text-gray-500">(leave blank to create automatically)</span><input value={data.slug} onChange={(e) => update("slug", e.target.value)} className="w-full border rounded p-2" /></label>
       <label>Excerpt<textarea value={data.excerpt} onChange={(e) => update("excerpt", e.target.value)} className="w-full border rounded p-2" rows={2} /></label>
-      <div><span className="mb-1 block">Content</span><ArticleContentEditor key={article?.id ?? "new"} initialHtml={data.content} onChange={(content) => setData((current) => ({ ...current, content }))} /></div>
+      <div><span className="mb-1 block">Content</span><ArticleContentEditor key={editorInstance} initialHtml={data.content} onChange={(content) => setData((current) => ({ ...current, content }))} /></div>
       <div className="grid md:grid-cols-2 gap-3"><label>Author<input value={data.author} onChange={(e) => update("author", e.target.value)} className="w-full border rounded p-2" /></label><label>Status<select value={String(data.status)} onChange={(e) => setData((current) => ({ ...current, status: Number(e.target.value) as 0 | 1 }))} className="w-full border rounded p-2"><option value="0">Draft</option><option value="1">Published</option></select></label></div>
       <fieldset className="border rounded p-3 grid gap-3"><legend className="px-1 font-medium">SEO</legend><label>SEO title <span className="text-xs text-gray-500">(max 60)</span><input maxLength={60} value={data.metaTitle} onChange={(e) => update("metaTitle", e.target.value)} className="w-full border rounded p-2" /></label><label>Meta description <span className="text-xs text-gray-500">(max 160)</span><textarea maxLength={160} value={data.metaDescription} onChange={(e) => update("metaDescription", e.target.value)} className="w-full border rounded p-2" rows={2} /></label><label>Canonical URL<input value={data.canonicalUrl} onChange={(e) => update("canonicalUrl", e.target.value)} className="w-full border rounded p-2" /></label></fieldset>
     </div>

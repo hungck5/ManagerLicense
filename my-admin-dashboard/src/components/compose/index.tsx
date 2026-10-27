@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { createEditor, Editor, Element as SlateElement, Range, Node } from "slate";
+import { createEditor, Editor, Element as SlateElement, Range, Node, Transforms } from "slate";
 import type { Descendant } from "slate";
 import { Editable, ReactEditor, Slate, useSlate, withReact } from "slate-react";
 import type { RenderElementProps, RenderLeafProps } from "slate-react";
 import { withHistory } from "slate-history";
-import { Bold, Italic, Underline, Strikethrough, List, ListOrdered, Quote, Undo2, Redo2, Download } from "lucide-react";
+import { Bold, Italic, Underline, Strikethrough, List, ListOrdered, Quote, Undo2, Redo2, Download, ImagePlus } from "lucide-react";
 import { Button } from "./Button";
 import { contentToHtml, emptyContent, escapeHtml, htmlToContent, isBlockActive, isList, isMarkActive, parseDraft, plainText, toggleBlock, toggleMark } from "./editor-utils";
 import type { ArticleDraft, Mark } from "./editor-utils";
 import type { BlockType } from "@/types/slate-custom-types";
+import { uploadArticleImage } from "@/services/articleService";
 
 type SaveState = "empty" | "restored" | "saving" | "saved" | "error";
 
@@ -140,7 +141,12 @@ export function ComposeEditor({ draftKey = "article-draft:local" }: { draftKey?:
 
 /** A controlled, compact version of the dashboard composer for article forms. */
 export function ArticleContentEditor({ initialHtml, onChange }: { initialHtml: string; onChange: (html: string) => void }) {
-  const [editor] = useState(() => withReact(withHistory(createEditor())));
+  const [editor] = useState(() => {
+    const slateEditor = withReact(withHistory(createEditor()));
+    const { isVoid } = slateEditor;
+    slateEditor.isVoid = element => element.type === "image" || isVoid(element);
+    return slateEditor;
+  });
   const [initial] = useState<Descendant[]>(() => htmlToContent(initialHtml));
   const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, []);
   const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, []);
@@ -150,7 +156,11 @@ export function ArticleContentEditor({ initialHtml, onChange }: { initialHtml: s
       <Slate editor={editor} initialValue={initial} onChange={value => {
         if (editor.operations.some(operation => operation.type !== "set_selection")) onChange(contentToHtml(value));
       }}>
-        <Toolbar />
+        <Toolbar onInsertImage={async file => {
+          const url = await uploadArticleImage(file);
+          Transforms.insertNodes(editor, { type: "image", url, alt: file.name, children: [{ text: "" }] });
+          Transforms.insertNodes(editor, { type: "paragraph", children: [{ text: "" }] });
+        }} />
         <Editable
           renderLeaf={renderLeaf}
           renderElement={renderElement}
@@ -163,8 +173,10 @@ export function ArticleContentEditor({ initialHtml, onChange }: { initialHtml: s
   );
 }
 
-function Toolbar() {
+function Toolbar({ onInsertImage }: { onInsertImage?: (file: File) => Promise<void> }) {
   const editor = useSlate();
+  const imageInput = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const marks = [
     { type: "bold", label: "In đậm (Ctrl+B)", icon: <Bold size={18} /> },
     { type: "italic", label: "In nghiêng (Ctrl+I)", icon: <Italic size={18} /> },
@@ -189,6 +201,16 @@ function Toolbar() {
       <span className="mx-1 h-5 border-l border-gray-200" aria-hidden="true" />
       {blocks.map(block => <Button key={block.type} title={block.label} aria-label={block.label} active={isBlockActive(editor, block.type)} disabled={!editor.selection}
         onMouseDown={event => event.preventDefault()} onClick={() => apply(() => toggleBlock(editor, block.type))}>{block.icon}</Button>)}
+      {onInsertImage && <><span className="mx-1 h-5 border-l border-gray-200" aria-hidden="true" />
+        <input ref={imageInput} type="file" accept="image/jpeg,image/png,image/gif,image/webp" className="hidden" onChange={async event => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          if (!file) return;
+          setUploading(true);
+          try { await onInsertImage(file); } catch { window.alert("Không thể tải ảnh lên. Vui lòng thử lại."); } finally { setUploading(false); ReactEditor.focus(editor); }
+        }} />
+        <Button title="Chèn ảnh" aria-label="Chèn ảnh" aria-pressed={undefined} disabled={uploading} onMouseDown={event => event.preventDefault()} onClick={() => imageInput.current?.click()}><ImagePlus size={18} /></Button>
+      </>}
     </div>
   );
 }
@@ -204,6 +226,7 @@ function Leaf({ attributes, children, leaf }: RenderLeafProps) {
 
 function Element({ attributes, children, element }: RenderElementProps) {
   switch (element.type) {
+    case "image": return <div {...attributes} className="my-4"><div contentEditable={false}><img src={element.url} alt={element.alt ?? ""} className="max-h-96 max-w-full rounded object-contain" /></div>{children}</div>;
     case "h1": return <h1 className="my-4 text-3xl font-bold leading-tight" {...attributes}>{children}</h1>;
     case "h2": return <h2 className="my-4 text-2xl font-bold leading-tight" {...attributes}>{children}</h2>;
     case "h3": return <h3 className="my-3 text-xl font-bold" {...attributes}>{children}</h3>;

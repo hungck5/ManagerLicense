@@ -67,6 +67,7 @@ services:
       <<: *dotnet-env
       ConnectionStrings__DefaultConnection: Server=sqlserver;Database=ArticleService;User Id=sa;Password=${SQL_PASSWORD};Encrypt=True;TrustServerCertificate=True
       Database__Initialize: "true"
+    volumes: ["article-media:/app/wwwroot/articles"]
     depends_on:
       sqlserver: { condition: service_healthy }
 
@@ -148,4 +149,5 @@ services:
 volumes:
   sql-data:
   license-keys:
+  article-media:
   mvc-data:

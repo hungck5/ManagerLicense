@@ -10,8 +10,8 @@ export type CustomText = {
   strikethrough?: boolean;
 };
 
-export type BlockType = "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote" | "bulleted-list" | "numbered-list" | "list-item";
-export type CustomElement = { type: BlockType; children: Descendant[] };
+export type BlockType = "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote" | "bulleted-list" | "numbered-list" | "list-item" | "image";
+export type CustomElement = { type: BlockType; children: Descendant[]; url?: string; alt?: string };
 declare module 'slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor & HistoryEditor;
