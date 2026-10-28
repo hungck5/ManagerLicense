@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contentToHtml, htmlToContent } from "./editor-utils";
+import { contentToHtml, htmlToContent } from "../../../my-admin-dashboard/src/components/compose/editor-utils";
 
 describe("article content HTML conversion", () => {
   it("serializes an uploaded image as a responsive HTML image", () => {

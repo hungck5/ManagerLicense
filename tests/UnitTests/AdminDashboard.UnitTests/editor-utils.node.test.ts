@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { createEditor, Editor, Transforms } from "slate";
 import type { Descendant } from "slate";
 import { withHistory } from "slate-history";
-import { contentToHtml, emptyContent, isBlockActive, isMarkActive, parseDraft, plainText, toggleBlock, toggleMark } from "../src/components/compose/editor-utils";
+import { contentToHtml, emptyContent, isBlockActive, isMarkActive, parseDraft, plainText, toggleBlock, toggleMark } from "../../../my-admin-dashboard/src/components/compose/editor-utils";
 
 function setup(content: Descendant[] = [{ type: "paragraph", children: [{ text: "Bài viết" }] }]) {
   const editor = withHistory(createEditor());

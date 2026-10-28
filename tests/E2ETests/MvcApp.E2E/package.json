@@ -1,0 +1,13 @@
+{
+  "name": "mvc-app-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:stack": "docker --context desktop-linux compose --env-file ../../../.env.e2e.test -f ../../../compose.yaml up -d --build",
+    "report:e2e": "playwright show-report playwright-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

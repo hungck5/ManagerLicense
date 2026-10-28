@@ -1,0 +1,15 @@
+{
+  "name": "admin-dashboard-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e:stack": "docker --context desktop-linux compose --env-file ../../../.env.e2e.test -f ../../../compose.yaml up -d --build",
+    "test:e2e:ui": "playwright test --config=playwright.ui.config.ts",
+    "test:e2e:ui:debug": "playwright test --config=playwright.ui.config.ts --ui",
+    "report:e2e": "playwright show-report playwright-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

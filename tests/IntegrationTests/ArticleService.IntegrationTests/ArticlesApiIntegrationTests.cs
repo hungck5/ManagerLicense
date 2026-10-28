@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
-namespace ArticleService.Tests;
+namespace ArticleService.IntegrationTests;
 
 public class ArticlesApiIntegrationTests : IClassFixture<ArticlesApiFactory>
 {
