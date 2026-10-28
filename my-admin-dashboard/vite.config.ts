@@ -16,7 +16,7 @@ export default defineConfig(({ command }) => ({
   },
   server: {
     port: 3000,
-    https: command === 'serve' && fs.existsSync(path.resolve(__dirname, './certs/localhost-key.pem')) ? {
+    https: command === 'serve' && process.env.VITE_E2E !== '1' && fs.existsSync(path.resolve(__dirname, './certs/localhost-key.pem')) ? {
       key: fs.readFileSync(path.resolve(__dirname, './certs/localhost-key.pem')),
       cert: fs.readFileSync(path.resolve(__dirname, './certs/localhost-cert.pem')),
     } : undefined,

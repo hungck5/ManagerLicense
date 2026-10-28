@@ -8,6 +8,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
+    "test:e2e": "playwright test --config=playwright.live.config.ts",
+    "test:e2e:stack": "docker --context desktop-linux compose --env-file ../.env.e2e.test -f ../compose.yaml up -d --build",
+    "test:e2e:ui": "playwright test --config=playwright.config.ts",
+    "test:e2e:ui:debug": "playwright test --config=playwright.config.ts --ui",
     "lint": "eslint .",
     "preview": "vite preview",
     "dev-http": "vite --port 3000",
@@ -29,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

@@ -6,7 +6,10 @@
 */appsettings.Development.json
 */dist/
 **/node_modules/
+**/playwright-report/
+**/test-results/
 .env
+.env.e2e.test
 .docker-local/
 
 # Runtime article images uploaded through the admin dashboard.
